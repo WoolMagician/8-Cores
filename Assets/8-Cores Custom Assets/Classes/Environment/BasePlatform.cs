@@ -1,7 +1,7 @@
 /*
  * - CLASS: BASE PLATFORM CLASS
  * - AUTHOR: FRANCESCO PODDA
- * - VERSION: 1.0
+ * - VERSION: 1.1
  * - CREATION DATE: MONDAY, 24 APRIL 2017
  */
 
@@ -13,11 +13,7 @@ using UnityEngine;
 /// Base class used for platforms behaviour.
 /// </summary>
 [System.Serializable]
-[RequireComponent(typeof(Rigidbody))]
 public class BasePlatform : MonoBehaviour {
-
-    //Used to store RigidBody attached to platform obj.
-    private Rigidbody rigidBody;
 
     //If true enables direction change on collision after wait time.
     public bool changeDirOnCollision = true;
@@ -27,66 +23,53 @@ public class BasePlatform : MonoBehaviour {
     public int timeBeforeDirChange = 2;
 
     //Used to lock movement while waiting.
-    [HideInInspector]
+    //[HideInInspector]
     public bool isLocked = false;
 
     //Speed multipliers.
-    [Range(-1000, 1000)]
+    [Range(0, 1000)]
     public float xSpeedMultiplier = 100f;
 
-    [Range(-1000, 1000)]
+    [Range(0, 1000)]
     public float ySpeedMultiplier = 0f;
 
-    [Range(-1000, 1000)]
+    [Range(0, 1000)]
     public float zSpeedMultiplier = 0f;
 
-    //Used to store current RigidBody speeds.
-    private float xSpeed = 1f;
-    private float ySpeed = 1f;
-    private float zSpeed = 1f;
+    //Used to store current platform speed.
+    private float xSpeed = 0f;
+    private float ySpeed = 0f;
+    private float zSpeed = 0f;
 
     //Used to store current platform direction.
     private float xDirection = 1f;
     private float yDirection = 1f;
     private float zDirection = 1f;
 
-	// Use this for initialization.
-	void Start ()
-    {
-        //Assign attached Rigidbody component to variable.
-        rigidBody = this.GetComponent<Rigidbody>();
+    //Used to store current platform position.
+    private float xPosition = 0f;
+    private float yPosition = 0f;
+    private float zPosition = 0f;
 
-        //Used to initialize the attached Rigidbody component.
-        InitRigidbody();
+    public int direction = 1;
 
-        //Start moving platform.
-        rigidBody.AddForce(new Vector3(xSpeed, ySpeed, zSpeed));
-    }
-
-    private void InitRigidbody()
-    {
-        //Avoid physics rotation bugs while adding forces.
-        rigidBody.freezeRotation = true;
-
-        //Keep the platform out of gravity physics.
-        rigidBody.useGravity = false;
-
-    }
-	
 	// Update is called once per frame.
-	void Update ()
+	void FixedUpdate ()
     {
-        //Check if platform is locked before setting velocity.
+        //Check if platform is locked before moving.
         if (!isLocked)
         {
-            //Update speeds.
-            xSpeed *= xSpeedMultiplier * Time.deltaTime;
-            ySpeed *= ySpeedMultiplier * Time.deltaTime;
-            zSpeed *= zSpeedMultiplier * Time.deltaTime;
-
-            //Set final speed.
-            this.rigidBody.velocity = new Vector3(xSpeed, ySpeed, zSpeed);
+            MovePlatform();
         }
+    }
+
+    private void MovePlatform()
+    {
+        xPosition = Mathf.SmoothDamp(transform.position.x, transform.position.x, ref xSpeed, (1000 - xSpeedMultiplier) * Time.fixedDeltaTime);
+        yPosition = Mathf.SmoothDamp(transform.position.y, transform.position.y, ref ySpeed, (1000 - ySpeedMultiplier) * Time.deltaTime);
+        zPosition = Mathf.SmoothDamp(transform.position.z, transform.position.z + direction, ref zSpeed, (1000 - zSpeedMultiplier) * Time.deltaTime);
+
+        transform.position = new Vector3(xPosition * xDirection, yPosition * yDirection, zPosition);
     }
 
     /// <summary>
@@ -94,47 +77,42 @@ public class BasePlatform : MonoBehaviour {
     /// </summary>
     /// <param name="lockSeconds">Time (s) platform waits after direction change.</param>
     /// <param name="velocity">Velocity assigned to platform after <code>lockSeconds</code>.</param>
-    /// <param name="forceDirection">Force added to platform after velocity is setted.</param>
     /// <param name="newDirection">New direction, usually is equal to <code>-Vector3.one</code>.</param>
     /// <returns></returns>
-    IEnumerator LockMovAndChangeDir(int lockSeconds, Vector3 velocity, Vector3 forceDirection, Vector3 newDirection)
+    IEnumerator LockMovAndChangeDir(int lockSeconds, Vector3 velocity, Vector3 newDirection)
     {
         //Change directions.
-        xSpeed *= newDirection.x;
-        ySpeed *= newDirection.y;
-        zSpeed *= newDirection.z;
+
 
         //Update velocity.
-        velocity = new Vector3(xSpeed * xDirection, ySpeed * yDirection, zSpeed * zDirection);
-
-        //Update force.
-        forceDirection = new Vector3(xSpeed, ySpeed, zSpeed);
+        //velocity = new Vector3(xSpeed * xDirection, ySpeed * yDirection, zSpeed * zDirection);
 
         //Set lock state to true.
         isLocked = true;
 
-        //Reset force & velocity.
-        rigidBody.velocity = Vector3.zero;
-
         yield return new WaitForSeconds(2);
+
+        direction *= -1;
+
+        //xDirection *= newDirection.x;
+        //yDirection *= newDirection.y;
+        //zDirection *= newDirection.z;
 
         //Reset lock state.
         isLocked = false;
-
-        //Add force to platform.
-        rigidBody.AddForce(forceDirection);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
         if (changeDirOnCollision)
         {
             //Make sure to avoid players and enemies.
-            if (other.gameObject.tag != "Player" && other.gameObject.tag != "Enemy")
+            if (collision.collider.tag != "Player" && collision.collider.tag != "Enemy")
             {
                 //Passing zero vectors just to make sure that local vars are cleared.
-                StartCoroutine(LockMovAndChangeDir(timeBeforeDirChange, Vector3.zero, Vector3.zero, -Vector3.one));
+                StartCoroutine(LockMovAndChangeDir(timeBeforeDirChange, Vector3.zero, -Vector3.one));
             }
         }
     }
 }
+
