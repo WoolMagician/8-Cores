@@ -268,12 +268,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c4f7fd420ec79944ac2ab8345f08790, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  changeDirectionOnCollide: 1
-  xVelMultiplier: 1
+  changeDirOnCollision: 1
+  timeBeforeDirChange: 2
+  isLocked: 0
+  xVelMultiplier: 100
   yVelMultiplier: 0
   zVelMultiplier: 0
-  useGravity: 0
-  isLocked: 0
 --- !u!54 &96671435
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -284,10 +284,10 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!1 &228151071
 GameObject:
