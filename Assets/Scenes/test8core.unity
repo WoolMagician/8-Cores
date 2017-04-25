@@ -11528,9 +11528,10 @@ MonoBehaviour:
   changeDirOnCollision: 1
   timeBeforeDirChange: 2
   isLocked: 0
-  xSpeedMultiplier: 500
+  xSpeedMultiplier: 0
   ySpeedMultiplier: 0
-  zSpeedMultiplier: 0
+  zSpeedMultiplier: 950
+  direction: 1
 --- !u!54 &863302348
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -11603,8 +11604,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 863302346}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9.74, y: 3.66, z: -8.5}
-  m_LocalScale: {x: 1.3895817, y: 0.23142204, z: 1.2969184}
+  m_LocalPosition: {x: -11.14, y: 3.66, z: -8.5}
+  m_LocalScale: {x: 3.8023007, y: 0.23142204, z: 3.7679706}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 21
@@ -25839,6 +25840,7 @@ MonoBehaviour:
   rollduration: 0.5
   walkSpeed: 2
   runSpeed: 8
+  inputVec: {x: 0, y: 0, z: 0}
   isStrafing: 0
   knockbackMultiplier: 7
   currentTarget: {fileID: 0}
