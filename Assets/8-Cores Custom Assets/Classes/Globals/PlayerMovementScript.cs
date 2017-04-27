@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,8 +6,13 @@ public class PlayerMovementScript : MonoBehaviour {
 
 	// Animator
 	public Animator anim;
+
 	// Camera object to be referenced, double a to avoid problems
-	public GameObject cameraa;
+
+	public Camera camera;
+
+    public CameraControllerNew camController;
+
 	// To be exchanged with values from the character
 	public float forwardSpeed = 8.0f;
 	public float lateralSpeed = 4.0f;
@@ -19,6 +24,9 @@ public class PlayerMovementScript : MonoBehaviour {
 	void Start()
 	{
 		anim = GetComponent<Animator> ();
+        camera = Camera.main;
+        camController = camera.GetComponent<CameraControllerNew>();
+        
 	}
 
 	void Update()
@@ -29,7 +37,7 @@ public class PlayerMovementScript : MonoBehaviour {
 		var z = Input.GetAxis("Vertical") * Time.deltaTime * forwardSpeed;
 
 		// Next line is commented until i get the way to making this fucking object to return
-		transform.LookAt (CameraController.PlayerFaceTo());
+		transform.LookAt (camController.PlayerFaceTo());
 		transform.Translate(x, 0, z);
 	}
 
