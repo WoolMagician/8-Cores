@@ -66,7 +66,7 @@ public class RPGCharacterControllerFREE : MonoBehaviour
     float z;
     float dv;
     float dh;
-    Vector3 inputVec;
+    public Vector3 inputVec;
     Vector3 newVelocity;
 
     //Weapon and Shield
@@ -104,7 +104,6 @@ public class RPGCharacterControllerFREE : MonoBehaviour
 
     void Update()
     {
-
         //make sure there is animator on character
         if (animator)
         {

@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 
+[System.Serializable]
 public class BaseCharacter : MonoBehaviour
 {
     public string characterName = "";
@@ -10,7 +11,9 @@ public class BaseCharacter : MonoBehaviour
     public float jumpSpeed;
     public float jumpForce;
 
-    public Mesh characterMesh;
+    public bool isSelected;
+
+    public SkinnedMeshRenderer characterMesh;
 
     public Avatar characterAvatar;
 
@@ -18,9 +21,15 @@ public class BaseCharacter : MonoBehaviour
 
     private void Start()
     {
-        characterMesh = this.GetComponent<Mesh>();
+        characterMesh = this.GetComponent<SkinnedMeshRenderer>();
 
         characterAvatar = this.GetComponent<Avatar>();
+
+    }
+
+    private void Update()
+    {
+        isSelected = this.enabled;
     }
 
 }
