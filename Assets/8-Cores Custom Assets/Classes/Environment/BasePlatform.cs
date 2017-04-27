@@ -54,12 +54,18 @@ public class BasePlatform : MonoBehaviour {
     public int direction = 1;
 
 	// Update is called once per frame.
-	void FixedUpdate ()
+	void Update ()
     {
         //Check if platform is locked before moving.
         if (!isLocked)
         {
             MovePlatform();
+        }
+        else
+        {
+            xPosition = 0;
+            yPosition = 0;
+            zPosition = 0;
         }
     }
 
@@ -81,18 +87,23 @@ public class BasePlatform : MonoBehaviour {
     /// <returns></returns>
     IEnumerator LockMovAndChangeDir(int lockSeconds, Vector3 velocity, Vector3 newDirection)
     {
+        Vector3 oldpos = Vector3.zero;
+
+        oldpos = transform.position;
         //Change directions.
 
 
         //Update velocity.
         //velocity = new Vector3(xSpeed * xDirection, ySpeed * yDirection, zSpeed * zDirection);
 
-        //Set lock state to true.
-        isLocked = true;
+        //Set lock state.
 
-        yield return new WaitForSeconds(2);
 
         direction *= -1;
+
+        isLocked = true;
+
+        yield return new WaitForSeconds(lockSeconds);
 
         //xDirection *= newDirection.x;
         //yDirection *= newDirection.y;
@@ -100,6 +111,7 @@ public class BasePlatform : MonoBehaviour {
 
         //Reset lock state.
         isLocked = false;
+
     }
 
     private void OnCollisionEnter(Collision collision)
