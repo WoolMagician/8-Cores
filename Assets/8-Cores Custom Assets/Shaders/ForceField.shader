@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced 'PositionFog()' with multiply of UNITY_MATRIX_MVP by position
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced 'PositionFog()' with multiply of UNITY_MATRIX_MVP by position
 // Upgrade NOTE: replaced 'V2F_POS_FOG' with 'float4 pos : SV_POSITION'
 
 Shader "FX/Forest Force Field" {
@@ -41,7 +43,7 @@ Shader "FX/Forest Force Field" {
 	v2f vert(appdata_base v)
 	{
 		v2f o;
-		o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+		o.pos = UnityObjectToClipPos (v.vertex);
 
 		float s = 1 / _Scale;
 		float t = _Time[0] * _Rate*_Scale;

@@ -1,4 +1,6 @@
-﻿Shader "Custom/Wireframe" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/Wireframe" {
 	Properties{
 		_MainTex("Base (RGB)", 2D) = "white" {}
 	_Gain("Gain", Float) = 1.5
@@ -33,7 +35,7 @@
 
 	vs2ps vert(appdata IN) {
 		vs2ps o;
-		o.vertex = mul(UNITY_MATRIX_MVP, IN.vertex);
+		o.vertex = UnityObjectToClipPos(IN.vertex);
 		o.bary = IN.tangent.xyz;
 		o.uv = IN.uv;
 		return o;
