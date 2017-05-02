@@ -5,81 +5,101 @@ using System.Collections.Generic;
 [System.Serializable]
 public class CharacterManager : MonoBehaviour
 {
-    public List<BaseCharacter> characters = new List<BaseCharacter>();
+    public List<BaseCharacter> characters = new List<BaseCharacter>(5);
     
     public string changeButton = "x";
 
-    public int selectedIndex = 0;
+    private int selectedCharIndex = 0;
 
-    private SkinnedMeshRenderer currentMesh;
+    //Change class type with current character controller. 
+    private RPGCharacterControllerFREE charController;
 
-    private Avatar currentAvatar;
+    //Reference game object for transition effects.
+    private GameObject transitionEffect;
 
-    private Animator characterAnimator;
 
-    public SkinnedMeshRenderer meshRenderer;
-
-    private RPGCharacterControllerFREE characterController;
-
-    // Use this for initialization
     void Start()
     {
+        if (charController == null)
+        {
+            Debug.LogWarning("CharacterManager.cs: Missing character controller script!");
+        }
 
-
-        characterAnimator = GetComponent<Animator>();
-
-        currentAvatar = characterAnimator.avatar;
-
-        characterController = GameObject.FindGameObjectWithTag("Player").GetComponent<RPGCharacterControllerFREE>();
-
-        UpdateCurrentCharacter(selectedIndex);
+        if (transitionEffect == null)
+        {
+            Debug.LogWarning("CharacterManager.cs: Missing transition effect game object!");
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        //Check if we got character controller attached to game object
-        if (characterController == null)
+        if (characters.Count > 0)
         {
-            Debug.LogWarning("CharacterManager.cs: Missing character controller!");
-            return; //Exit from Update
+            if (Input.GetKeyDown(changeButton))
+            {
+                //Lock character movement.
+                //Change coroutine according to current character controller script.
+                StartCoroutine(charController._LockMovementAndAttack(0, 0.25f));
+
+                //Play transition effect.
+                StartCoroutine(PlayTransitionEffect(0, 1f));
+
+                //Update character.
+                UpdateCurrentCharacter(selectedCharIndex);
+
+            }
         }
-
-        if (Input.GetKeyDown(changeButton))
-        {
-            currentMesh = null; //Clear mesh
-            currentAvatar = null; //Clear avatar
-
-            StartCoroutine(characterController._LockMovementAndAttack(0, 0.25f));
-
-            PlayTransitionEffect(); //Play transition effects before switch characters
-
-            UpdateCurrentCharacter(selectedIndex);
-
-            selectedIndex += 1;
-        }
-
-        /*
-         * Clamp selectedIdex maximum to characters.Count
-         * Use this function if -select character- menu is disabled or character number is <= 2.
-        */
-        if(selectedIndex > characters.Count - 1)
-        {
-            selectedIndex = 0;
-        }
-
     }
 
     void UpdateCurrentCharacter(int index)
     {
-        meshRenderer = characters[index].characterMesh;
+        int indexRollback = selectedCharIndex;
 
-        currentAvatar = characters[index].characterAvatar;
+        //Deactivate old character
+        if (characters[selectedCharIndex].isSelected)
+        {
+            characters[selectedCharIndex].gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("CharacterManager.cs: Error while trying to deactivate old character.");
+            return;
+        }
 
+        //Clamp selectedCharIndex maximum to characters.Count
+        if (selectedCharIndex > characters.Count - 1)
+        {
+            //Reset index.
+            selectedCharIndex = 0;
+        }
+        else
+        {
+            //Update index.
+            selectedCharIndex += 1;
+        }
+
+        if (!characters[selectedCharIndex].isSelected)
+        {
+            //Activate new character
+            characters[selectedCharIndex].gameObject.SetActive(true);
+        }       
+        else
+        {
+            Debug.LogWarning("CharacterManager.cs: Error while trying to activate new character.");
+
+            //Rollback index on failed switch
+            selectedCharIndex = indexRollback;
+
+            return;
+        }
     }
 
-    void PlayTransitionEffect()
+    IEnumerator PlayTransitionEffect(float delayTime, float effectTime)
     {
+        yield return new WaitForSeconds(delayTime);
+        transitionEffect.SetActive(true);
 
+        yield return new WaitForSeconds(effectTime);
+        transitionEffect.SetActive(false);
     }
 }
