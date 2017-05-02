@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 [System.Serializable]
-public class Boomerang : MonoBehaviour {
+public class YoYo : MonoBehaviour {
 	public Transform playerObj;
     public Transform handTransform;
     public GameObject enemy ;
@@ -61,7 +61,10 @@ public class Boomerang : MonoBehaviour {
         enemy  = new GameObject();
 
         ResetYoyoState();
-	}
+
+        Charging(false);
+
+    }
 
     private void FixedUpdate()
     {
@@ -89,7 +92,7 @@ public class Boomerang : MonoBehaviour {
 
     }
 
-    void Update ()
+    void Update()
     {
         //if (Vector3.Distance(transform.position, playerObj.position) >= 10f && !playerHasYoyo)
         //{
@@ -97,20 +100,28 @@ public class Boomerang : MonoBehaviour {
         //}
 
         //Check if player has yoyo and if it is thrown.
-        if (playerHasYoyo && Input.GetButtonDown(yoyoThrowButton)) {
+        if (playerHasYoyo && Input.GetButtonDown(yoyoThrowButton))
+        {
+            Charging(true);
 
+            trailRenderer.enabled = true;
+        }
+
+        //Check if player has yoyo and if it is thrown.
+        if (playerHasYoyo && Input.GetButtonUp(yoyoThrowButton))
+        {
             posX = playerObj.position.x;
 
             posZ = playerObj.position.z;
 
+            Charging(false);
+
             SetYoyoState(false); //Throw yoyo.
 
-            trailRenderer.enabled = true;
-            
             transform.rotation = Quaternion.Euler(0, 0, 90); //Used to fix Z rotation.
         }
 
-		if (playerHasYoyo)
+        if (playerHasYoyo)
         {
             if (throwTime == 0)
             {
@@ -193,7 +204,11 @@ public class Boomerang : MonoBehaviour {
     {
         if (isCharging)
         {
-            //effects.Enabled = true;
+            effects.SetActive(true);
+        }
+        else
+        {
+            effects.SetActive(false);
         }
     }
 
