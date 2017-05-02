@@ -13,17 +13,17 @@ public class BaseCharacter : MonoBehaviour
 
     public bool isSelected;
 
-    public SkinnedMeshRenderer characterMesh;
+    //public SkinnedMeshRenderer characterMesh;
 
-    public Avatar characterAvatar;
+    //public Avatar characterAvatar;
 
     public BaseWeapon[] weaponArray;
 
     private void Start()
     {
-        characterMesh = this.GetComponent<SkinnedMeshRenderer>();
+        //characterMesh = this.GetComponent<SkinnedMeshRenderer>();
 
-        characterAvatar = this.GetComponent<Avatar>();
+        //characterAvatar = this.GetComponent<Avatar>();
 
     }
 
