@@ -23,7 +23,7 @@ public class BasePlatform : MonoBehaviour {
     public int timeBeforeDirChange = 2;
 
     //Used to lock movement while waiting.
-    //[HideInInspector]
+    [HideInInspector]
     public bool isLocked = false;
 
     //Speed multipliers.
