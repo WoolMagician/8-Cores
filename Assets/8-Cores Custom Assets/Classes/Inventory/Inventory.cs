@@ -5,7 +5,6 @@ using UnityEngine;
 
 [System.Serializable]
 public class Inventory : MonoBehaviour {
-
     //[HideInInspector]
     public List<InventorySlot> slotList = new List<InventorySlot>();
 
@@ -15,41 +14,78 @@ public class Inventory : MonoBehaviour {
     public string openInventoryButton = "PS4_TRIANGLE";
 
     [HideInInspector]
-    public string openInventoryKey = "i";
+    public string openInventoryKey = "";
 
-    public bool isOpened = false;
+    public Texture2D quickSlotTexture;
+
+    public bool isInvOpened = false;
+
+    public bool isQuickOpened = true;
 
     public int maxSlotNumber;
 
+    public int quickAccessSlotNumber;
+
     public BlurOptimized blur;
+
+    public BaseCollectibleItem[] items;
 
     public void Start()
     {
         maxSlotNumber = 20;
+        quickAccessSlotNumber = 4;
 
         blur = Camera.main.GetComponent<BlurOptimized>();
-        blur.enabled = isOpened;
+        blur.enabled = isInvOpened;
+
+
+
+        for (int i = 0; i < quickAccessSlotNumber; i++)
+        {
+            InventorySlot tempSlot = new InventorySlot();
+
+            tempSlot.quickAccess = true;
+
+            tempSlot.item = items[i];
+
+            tempSlot.currentSlotValue = Random.Range(1,10);
+
+            slotList.Add(tempSlot);
+        }
 
     }
 
     public void Update()
     {
-        if (Input.GetButtonDown("PS4_TRIANGLE"))
+        if (Input.GetKeyDown("i")) //|| Input.GetButtonDown(openInventoryButton))
         {
-            isOpened = !isOpened;
-            blur.enabled = isOpened;
+            isQuickOpened = isInvOpened;
+            isInvOpened = !isInvOpened;
+            blur.enabled = isInvOpened;
+
+            if (isInvOpened)
+            {
+                Time.timeScale = 0;
+            }
+
+            else
+            {
+                Time.timeScale = 1;
+            }
         }
 
-        if (isOpened)
-        {
-            Time.timeScale = 0;
-        }
 
-        else
-        {
-            Time.timeScale = 1;
-        }
 
+
+
+        //if (Input.GetKey("q") && !isInvOpened)//|| Input.GetButtonDown(openInventoryButton))
+        //{
+        //    isQuickOpened = true;
+        //}
+        //else
+        //{
+        //    isQuickOpened = false;
+        //}
     }
 
     public ActionResult AddItem(BaseCollectibleItem objectToAdd)
@@ -58,21 +94,25 @@ public class Inventory : MonoBehaviour {
         
         foreach (InventorySlot slot in slotList)
         {
-            if (slot.item.type == objectToAdd.type)
+            if (!slot.quickAccess)
             {
-                if(!slot.slotFull)
+                if (slot.item.type == objectToAdd.type)
                 {
-                    needNewItemSlot = false;
-                    
-                    slot.currentSlotValue += 1;
+                    if (!slot.slotFull)
+                    {
+                        needNewItemSlot = false;
 
-                    slot.CheckMaxValue();
+                        slot.currentSlotValue += 1;
 
-                    Debug.Log("PICKED UP OBJECT!");
+                        slot.CheckMaxValue();
 
-                    return ActionResult.Success; 
+                        Debug.Log("PICKED UP OBJECT!");
+
+                        return ActionResult.Success;
+                    }
                 }
             }
+
         }
         
         if (needNewItemSlot)
@@ -87,9 +127,12 @@ public class Inventory : MonoBehaviour {
 
             foreach (InventorySlot slot1 in slotList)
             {
-                if(slot1.item.type == objectToAdd.type)
+                if (!slot1.quickAccess)
                 {
-                    slotCounter += 1;
+                    if (slot1.item.type == objectToAdd.type)
+                    {
+                        slotCounter += 1;
+                    }
                 }
             }
 
@@ -127,16 +170,18 @@ public class Inventory : MonoBehaviour {
         return ActionResult.Success;
     }
 
+    //DA RICONTROLLARE, MODIFICATO IL 12/06/2017
     public ActionResult RemoveItem(BaseCollectibleItem.Type itemToRemove, int quantity)
     {
         foreach (InventorySlot slot in slotList)
         {
             if (slot.item.type == itemToRemove)
             {
-                if (slot.currentSlotValue > 0)
+                if (slot.currentSlotValue >= quantity)
                 {
-                    if (quantity < slot.currentSlotValue)
-                    {
+
+                    //if (quantity < slot.currentSlotValue)
+                    //{
                         slot.currentSlotValue -= quantity;
 
                         Debug.Log(slot.currentSlotValue);
@@ -148,13 +193,14 @@ public class Inventory : MonoBehaviour {
 
                         return ActionResult.Success;
 
-                    }
-                    else
-                    {
-                        Debug.Log("You don't have enought items.");
-                        return ActionResult.NotEnoughtItems;
-                    }
+                    //}
 
+
+                }
+                else
+                {
+                    Debug.Log("You don't have enought items.");
+                    return ActionResult.NotEnoughtItems;
                 }
 
             }
@@ -173,4 +219,36 @@ public class Inventory : MonoBehaviour {
         InventoryFull = 3,
         NoItemFound = 4,
     }
+
+    private void OnGUI()
+    {
+        if (isQuickOpened)
+        {
+            ArrangeRapidAccessSlots();
+        }
+        
+    }
+
+    public void ArrangeRapidAccessSlots()
+    {
+        int numberOfPoints = 0;
+        int circleRadius = 55;
+        float angleIncrement = 0;
+
+        numberOfPoints = quickAccessSlotNumber;
+        angleIncrement = 360 / numberOfPoints;
+
+        for (int i = 0; i < numberOfPoints; i++)
+        {
+            Vector2 p = new Vector2();
+
+            p.x = (circleRadius * Mathf.Cos((angleIncrement * i) * (Mathf.PI / 180)));
+            p.y = (circleRadius * Mathf.Sin((angleIncrement * i) * (Mathf.PI / 180)));
+
+            GUI.depth = 2;
+            GUI.Label(new Rect((150 + p.x) - (20 / 2), (((Screen.height - 150) + p.y) - (20 / 2)), 20, 20), quickSlotTexture);
+
+        }
+    }
+
 }

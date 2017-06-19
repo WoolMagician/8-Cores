@@ -5,7 +5,7 @@ using System.Collections;
 
 public class CameraController : MonoBehaviour
 {
-    private InputManager input;
+    private GameSettings input;
 
     [Header("Camera Properties")]
     public float DistanceAway;                     //how far the camera is from the player.
@@ -32,7 +32,7 @@ public class CameraController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        input = FindObjectOfType<InputManager>().GetComponent<InputManager>();
+        //input = FindObjectOfType<GameSettings>().GetComponent<GameSettings>();
         //the statement below automatically positions the camera behind the target.
         rotateAround = target.eulerAngles.y - 45f;
 

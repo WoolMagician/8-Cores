@@ -1,11 +1,14 @@
 using UnityEngine;
 
+[System.Serializable]
 public class InventorySlot
 {
     public BaseCollectibleItem item = null;
     public int currentSlotValue = 0;
     public bool slotFull = false;
-    
+    public bool quickAccess = false;
+    public string quickAccessKey = "";
+
     public int slotWidth = 20;
     public int slotHeight = 20;
     public int slotPosX = 0;

@@ -17,7 +17,7 @@ public class BaseCharacter : MonoBehaviour
 
     //public Avatar characterAvatar;
 
-    public BaseWeapon[] weaponArray;
+    //public BaseWeapon[] weaponArray;
 
     private void Start()
     {

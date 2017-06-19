@@ -5,13 +5,13 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityStandardAssets.ImageEffects;
 
-
 public enum Weapon 
 {
 	UNARMED = 0,
 	RELAX = 8
 }
 
+[System.Serializable]
 public class RPGCharacterControllerFREE : MonoBehaviour
 {
     #region Variables

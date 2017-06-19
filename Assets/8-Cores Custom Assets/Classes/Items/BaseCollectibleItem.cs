@@ -12,9 +12,8 @@ public class BaseCollectibleItem : MonoBehaviour
     public Inventory inventory;
 
     public GameObject itemMaterial;
-    public GameObject item2DTexture;
+    public Texture2D item2DTexture;
     public GameObject itemMesh;
-
 
     //Overrides drop rate percent
     public bool randomDropRate;
@@ -22,6 +21,16 @@ public class BaseCollectibleItem : MonoBehaviour
     public Rarity rarity;
     public Type type;
 
+    public void Start()
+    {
+        //item2DTexture = new Texture2D(100, 100).blackTexture;
+
+        //// set the pixel values
+        //item2DTexture
+
+        //// Apply all SetPixel calls
+        //item2DTexture.Apply();
+    }
 
     public void Update()
     {

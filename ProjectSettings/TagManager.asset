@@ -10,6 +10,7 @@ TagManager:
   - LightBulb
   - Enemy
   - Environment
+  - Inventory
   layers:
   - Default
   - TransparentFX

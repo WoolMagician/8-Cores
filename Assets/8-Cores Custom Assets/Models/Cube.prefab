@@ -76,6 +76,7 @@ MeshRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
 --- !u!33 &33930544179188964
 MeshFilter:
@@ -118,7 +119,7 @@ Light:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1851671351886548}
   m_Enabled: 1
-  serializedVersion: 7
+  serializedVersion: 8
   m_Type: 2
   m_Color: {r: 0, g: 0.5034485, b: 1, a: 1}
   m_Intensity: 2.11
@@ -143,6 +144,8 @@ Light:
   m_Lightmapping: 4
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 0.79
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!114 &114067980485464780
@@ -164,7 +167,7 @@ MonoBehaviour:
   dropRatePercent: 0
   inventory: {fileID: 0}
   itemMaterial: {fileID: 0}
-  item2DTexture: {fileID: 0}
+  item2DTexture: {fileID: 2800000, guid: d72ddbac673e73248a421cac6415c35c, type: 3}
   itemMesh: {fileID: 0}
   randomDropRate: 0
   rarity: 50
