@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,15 +11,12 @@ public class GameManager : MonoBehaviour
     private GameSession[] allSessions = new GameSession[5];    //Tutti i salvataggi fatti fin'ora
     private GameSession tempSession;    //Sessione temporanea di appoggio per il salvataggio/caricamento dati.
     private GameSettings gameSettings = new GameSettings();
+    public Texture2D tex;
 
     private BaseCharacter tempChar;
-    //private Inventory tempInventory;   
-
     public static DataManager dataManager;
 
     public int sessionToLoadIndex = 0;
-    public int currentSessionIndex = 0;
-    public bool newGame = false;
 
     public GameSession currentSession;
 
@@ -26,31 +24,36 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         dataManager = new DataManager(this);
+
+        //Creates Saves directory and base settings file.
         dataManager.Initialize();
 
+        //Load all sessions, user will chose wich one to load.
         allSessions = dataManager.LoadAll().ToArray();
+
+        //Load settings.
         gameSettings = dataManager.LoadSettings();
 
+        //Check if there are any save files and let user chose.
         if (allSessions.Length > 0)
         {
             //SCELTA DELL'UTENTE
 
             //SELEZIONE SESSIONE
-            currentSession = allSessions[currentSessionIndex];
+            currentSession = allSessions[sessionToLoadIndex];
             currentSession.Update(dataManager);
         }
         else
         {
-            currentSession = new GameSession();
-            currentSession.savedInventory = new InventoryData(20, 4);
             //NEW GAME NEEDED.
+            NewGame();
+
         }
 
-        //tempSession = new GameSession();
         tempChar = GameObject.FindGameObjectWithTag("Player").GetComponent<BaseCharacter>();
 
-        //dataManager.MergeClassProperties(tempChar, tempSession.character);
-        
+        Debug.Log("Current loaded session: SAV_" + currentSession.creationDate.ToString("ddMMyyyyHHmmss") + ".ecd");
+
     }
 
     // Update is called once per frame
@@ -58,9 +61,14 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F3))
         {
+            //Use tempSession for saving.
             tempSession = currentSession;
 
+            //Save session with index increased.
             dataManager.Save(tempSession);
+
+            //Update sessions list.
+            allSessions = dataManager.LoadAll().ToArray();
 
         }
         else if (Input.GetKeyDown(KeyCode.F4))
@@ -80,5 +88,19 @@ public class GameManager : MonoBehaviour
             gameSettings = dataManager.LoadSettings();
 
         }
+
+    }
+
+    private void NewGame()
+    {
+        currentSession = new GameSession();
+        currentSession.ID = 0;
+        currentSession.creationDate = DateTime.Now;
+        currentSession.inventory = new InventoryData(20, 4);
+
+        tempSession = currentSession;
+        dataManager.Save(tempSession);
+
+        Debug.Log("New game created!");
     }
 }

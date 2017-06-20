@@ -22,7 +22,6 @@ GameObject:
   - component: {fileID: 33291394668353824}
   - component: {fileID: 23549264456356018}
   - component: {fileID: 64772783248942198}
-  - component: {fileID: 114335371753388276}
   - component: {fileID: 54179967489978064}
   - component: {fileID: 135068758468091160}
   m_Layer: 0
@@ -75,6 +74,7 @@ MeshRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
 --- !u!33 &33291394668353824
 MeshFilter:
@@ -112,33 +112,6 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: ae0a53fd687ea5e4189fc2c2a9cec6c5, type: 3}
---- !u!114 &114335371753388276
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1182203418169150}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c132f56b55b4b7b478ef9f29a0e16dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemName: Junk
-  itemID: 5
-  maxStackValue: 0
-  maxStackNumber: 0
-  currentStackValue: 0
-  dropRatePercent: 0
-  inventory: {fileID: 0}
-  itemMaterial: {fileID: 0}
-  item2DTexture: {fileID: 0}
-  itemMesh: {fileID: 0}
-  randomDropRate: 0
-  rarity: 1
-  type: 1
-  junkValue: 10
-  inventoryGameObject: {fileID: 0}
-  inventoryCopy: {fileID: 0}
 --- !u!135 &135068758468091160
 SphereCollider:
   m_ObjectHideFlags: 1

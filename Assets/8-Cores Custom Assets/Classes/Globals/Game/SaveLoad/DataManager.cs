@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -11,7 +12,7 @@ using UnityEngine;
 /// </summary>
 public class DataManager
 {
-        //All savable classes
+    //All savable classes
     private SavedCharacter tempCharacter;
     private SavedInventory tempInventory;
     private SavedEnvironment tempEnvironment;
@@ -39,8 +40,6 @@ public class DataManager
     /// </summary>
     public void Initialize()
     {
-        //savedSessions = LoadAll();
-
         if (!Directory.Exists(Application.persistentDataPath + "/Saves"))
         {
             Directory.CreateDirectory(Application.persistentDataPath + "/Saves");
@@ -60,33 +59,12 @@ public class DataManager
     {
         try
         {
-            //tempCharacter = new SavedCharacter();
-            //MergeClassProperties(GameObject.FindGameObjectWithTag("Player").GetComponent<BaseCharacter>(), tempCharacter);
-            //session.savedCharacter = tempCharacter;
-            //session.saveDate = DateTime.Now;
-            //session.ID = LoadAll().Count;
-
             session.PrepareSessionForSaving(this);
 
             savedSessions.Clear();
             savedSessions.Add(session);
 
-            //Check if save file already exists, if so append saved sessions.
-            //if (File.Exists(savesPath))
-            //{
-            Debug.Log("Found save file, appending last save.");    //Need to check if we are in debug mode.
-
-            //file = File.Open(savesPath, FileMode.Append, FileAccess.Write);
-
             file = File.Create(savesPath + "/SAV_" + DateTime.Now.ToString(dateTimeFormatString) + ".ecd");
-            //}
-            //else
-            //{
-            //    Debug.Log("Save file not found, creating a new one and appending last save."); 
-
-            //    file = File.Create(savesPath);
-
-            //}
 
             binFormatter.Serialize(file, savedSessions);
 
@@ -97,9 +75,8 @@ public class DataManager
         }
         catch (System.Exception)
         {
-            throw;
             Debug.LogWarning("Failed to save session.");
-
+            throw;
         }
     }
 
@@ -107,58 +84,54 @@ public class DataManager
     /// 
     /// </summary>
     /// <returns></returns>
-    public GameSession Load()   //POSSIBILE RIMOZIONE FUNZIONE, RIMPIAZZO CON 'Load(int sessionIndex)'
+    public GameSession Load(int index)
     {
-        savedSessions.Clear();
+        DirectoryInfo dir = new DirectoryInfo(savesPath);
+        FileInfo[] fi = dir.GetFiles();
+        List<GameSession> tempSessionList;
+        GameSession returnGameSession = null;
 
-        if (File.Exists(savesPath))
-        {
-            file = File.Open(savesPath, FileMode.Open);
-            savedSessions = (List<GameSession>)binFormatter.Deserialize(file);
-            file.Close();
-        }
-        else
-        {
-            Debug.LogWarning("Error while loading file: File not found.");
-        }
-
-        Debug.Log("Loaded: " + savesPath);
-
-        return savedSessions[0];
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="sessionIndex"></param>
-    /// <returns></returns>
-    public GameSession Load(int sessionIndex)
-    {
-        savedSessions.Clear();
+        int count = fi.Length;
 
         if (Directory.Exists(savesPath))
         {
             Debug.Log("Loading save file...");
 
-            if (File.Exists(savesPath + "/SAV_" + sessionIndex + ".ecd"))
+            for (int i = 0; i < count; i++)
             {
-                file = File.Open(savesPath + "/SAV_" + sessionIndex + ".ecd", FileMode.Open);
-                savedSessions = (List<GameSession>)binFormatter.Deserialize(file);
-                file.Close();
+                string fileName = fi[i].FullName;
 
-                Debug.Log("Loaded file: " + savesPath + "/SAV_" + sessionIndex + ".ecd");
+                if (File.Exists(fileName))
+                {
+                    file = File.Open(fileName, FileMode.Open);
+
+                    tempSessionList = ((List<GameSession>)binFormatter.Deserialize(file));
+
+                    if (tempSessionList[0].ID == index)
+                    {
+                        Debug.Log("Loaded: " + fileName);
+                        returnGameSession =  tempSessionList[0];
+
+                        continue;
+                    }
+                    
+                }
+                else
+                {
+                    //WE SHOULD NEVER GET THERE PORCODIO!!!
+                    Debug.LogWarning("Error while loading file: File '" + fileName + "' not found.");
+                    break;
+                }
+
             }
-            else
-            {
-                Debug.LogWarning("Error while loading file: File '" + savesPath + "/SAV_" + sessionIndex + ".ecd" + "' not found.");
-            }
+            file.Close();
         }
         else
         {
-            Debug.LogWarning("Error while loading file: Directory '" + savesPath + "' not found.");
+            Debug.LogWarning("Error while searching files: Directory '" + savesPath + "' not found.");
         }
 
-        return savedSessions[0];
+        return returnGameSession;
     }
 
     /// <summary>
@@ -170,37 +143,44 @@ public class DataManager
         DirectoryInfo dir = new DirectoryInfo(savesPath);
         FileInfo[] fi = dir.GetFiles();
 
+        List<GameSession> tempSessionList;
+
         int count = fi.Length;
 
         savedSessions.Clear();
 
         if (Directory.Exists(savesPath))
         {
-            Debug.Log("Loading save files...");
+            Debug.Log("Updating save files list...");
 
-            for (int i = 0; i < count - 1; i++)
+            for (int i = 0; i < count; i++)
             {
-                string fileName = fi[i].Directory.FullName;
+                string fileName = fi[i].FullName;
 
                 if (File.Exists(fileName))
                 {
                     file = File.Open(fileName, FileMode.Open);
-                    savedSessions.Add(((GameSession)binFormatter.Deserialize(file)));
+
+                    tempSessionList = ((List<GameSession>)binFormatter.Deserialize(file));
+                    savedSessions.Add(tempSessionList[0]);
+                    tempSessionList.Clear();
+
                     file.Close();
-                    Debug.Log(" -" + fileName);
+                    Debug.Log("Found: " + fileName);
                 }
                 else
                 {
+                    //WE SHOULD NEVER GET THERE PORCODIO!!!
                     Debug.LogWarning("Error while loading file: File '" + fileName + "' not found.");
                 }
 
             }
 
-            Debug.Log("Done!");
+            Debug.Log("Done updating list!");
         }
         else
         {
-            Debug.LogWarning("Error while loading file: Directory '"+ savesPath +"' not found.");
+            Debug.LogWarning("Error while searching files: Directory '"+ savesPath +"' not found.");
         }
 
         return savedSessions;
@@ -269,29 +249,18 @@ public class DataManager
         ClassMerger.MergeClassProperties(from, to);
     }
 
+
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="camera"></param>
     /// <returns></returns>
-    private Texture2D CameraScreenshot(Camera camera)
+    public int GetSavesNumber()
     {
-        // 4k = 3840 x 2160   FHD = 1920 x 1080
-        int resWidth = 1920;
-        int resHeight = 1080;
-        Texture2D screenShot;
-        RenderTexture renderTexture;
+        DirectoryInfo dir = new DirectoryInfo(savesPath);
+        FileInfo[] fi = dir.GetFiles();
 
-        renderTexture = new RenderTexture(resWidth, resHeight, 24);
-        camera.targetTexture = renderTexture;
-        screenShot = new Texture2D(resWidth, resHeight, TextureFormat.RGB24, false);
-        camera.Render();
-        RenderTexture.active = renderTexture;
-        screenShot.ReadPixels(new Rect(0, 0, resWidth, resHeight), 0, 0);
-
-        return screenShot;
-    }    //DA SPOSTARE NELLO SCRIPT DI GESTIONE TELECAMERA E/O IN GLOBALS
-
+        return fi.Length;
+    }
 }
 
 /// <summary>
