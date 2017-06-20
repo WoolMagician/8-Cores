@@ -6,78 +6,108 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
+/// <summary>
+/// 
+/// </summary>
 public class DataManager
 {
-    private static string settingsPath = Application.persistentDataPath + "/settings.ecd";
-    private static string savesPath = Application.persistentDataPath + "/saves.ecd";
-
-    private static List<GameSession> savedSessions = new List<GameSession>();
-
-    private GameManager gameManager;
-    private BinaryFormatter binFormatter = new BinaryFormatter();
-    private FileStream file = null;
-
-    //All savable classes
+        //All savable classes
     private SavedCharacter tempCharacter;
     private SavedInventory tempInventory;
     private SavedEnvironment tempEnvironment;
     private SavedSettings tempSettings;
 
+    private GameManager gameManager;
+    private BinaryFormatter binFormatter = new BinaryFormatter();
+    private FileStream file = null;
+    private static string settingsPath = Application.persistentDataPath + "/settings.ecd";
+    private static string savesPath = Application.persistentDataPath + "/Saves";
+    private static string dateTimeFormatString = "ddMMyyyyHHmmss";
+    private static List<GameSession> savedSessions = new List<GameSession>();
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="gm"></param>
     public DataManager(GameManager gm)
     {
         this.gameManager = gm;
     }
 
-    public GameSession[] Initialize()
+    /// <summary>
+    /// 
+    /// </summary>
+    public void Initialize()
     {
-        savedSessions = LoadAll();
+        //savedSessions = LoadAll();
 
-        return savedSessions.ToArray();
+        if (!Directory.Exists(Application.persistentDataPath + "/Saves"))
+        {
+            Directory.CreateDirectory(Application.persistentDataPath + "/Saves");
+        }
+
+        if (!File.Exists(Application.persistentDataPath + "/settings.ecd"))
+        {
+            File.Create(Application.persistentDataPath + "/settings.ecd");
+        }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="session"></param>
     public void Save(GameSession session)
     {
         try
         {
-            tempCharacter = new SavedCharacter();
-            MergeClassProperties(GameObject.FindGameObjectWithTag("Player").GetComponent<BaseCharacter>(), tempCharacter);
-            gameManager.tempSession.character = tempCharacter;
-            gameManager.tempSession.saveDate = DateTime.Now;
-            gameManager.tempSession.ID = LoadAll().Count;
+            //tempCharacter = new SavedCharacter();
+            //MergeClassProperties(GameObject.FindGameObjectWithTag("Player").GetComponent<BaseCharacter>(), tempCharacter);
+            //session.savedCharacter = tempCharacter;
+            //session.saveDate = DateTime.Now;
+            //session.ID = LoadAll().Count;
+
+            session.PrepareSessionForSaving(this);
 
             savedSessions.Clear();
-            savedSessions.Add(gameManager.tempSession);
+            savedSessions.Add(session);
 
             //Check if save file already exists, if so append saved sessions.
-            if (File.Exists(savesPath))
-            {
-                Debug.Log("Found save file, appending last save.");    //Need to check if we are in debug mode.
+            //if (File.Exists(savesPath))
+            //{
+            Debug.Log("Found save file, appending last save.");    //Need to check if we are in debug mode.
 
-                file = File.Open(savesPath, FileMode.Append, FileAccess.Write);
+            //file = File.Open(savesPath, FileMode.Append, FileAccess.Write);
 
-            }
-            else
-            {
-                Debug.Log("Save file not found, creating a new one and appending last save."); 
+            file = File.Create(savesPath + "/SAV_" + DateTime.Now.ToString(dateTimeFormatString) + ".ecd");
+            //}
+            //else
+            //{
+            //    Debug.Log("Save file not found, creating a new one and appending last save."); 
 
-                file = File.Create(savesPath);
+            //    file = File.Create(savesPath);
 
-            }
+            //}
 
             binFormatter.Serialize(file, savedSessions);
+
             file.Close();
 
-            Debug.Log("Saved new session -ID: " + savedSessions[0].ID +  "- to path: " + savesPath);
+            Debug.Log("Saved new session -ID: " + savedSessions[0].ID +  "- to path: " + savesPath + "/SAV_" + DateTime.Now.ToString(dateTimeFormatString) + ".ecd");
 
         }
         catch (System.Exception)
         {
+            throw;
             Debug.LogWarning("Failed to save session.");
 
         }
     }
 
-    public GameSession Load()
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public GameSession Load()   //POSSIBILE RIMOZIONE FUNZIONE, RIMPIAZZO CON 'Load(int sessionIndex)'
     {
         savedSessions.Clear();
 
@@ -97,46 +127,89 @@ public class DataManager
         return savedSessions[0];
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sessionIndex"></param>
+    /// <returns></returns>
     public GameSession Load(int sessionIndex)
     {
         savedSessions.Clear();
 
-        if (File.Exists(savesPath))
+        if (Directory.Exists(savesPath))
         {
-            file = File.Open(savesPath, FileMode.Open);
-            savedSessions = (List<GameSession>)binFormatter.Deserialize(file);
-            file.Close();
+            Debug.Log("Loading save file...");
+
+            if (File.Exists(savesPath + "/SAV_" + sessionIndex + ".ecd"))
+            {
+                file = File.Open(savesPath + "/SAV_" + sessionIndex + ".ecd", FileMode.Open);
+                savedSessions = (List<GameSession>)binFormatter.Deserialize(file);
+                file.Close();
+
+                Debug.Log("Loaded file: " + savesPath + "/SAV_" + sessionIndex + ".ecd");
+            }
+            else
+            {
+                Debug.LogWarning("Error while loading file: File '" + savesPath + "/SAV_" + sessionIndex + ".ecd" + "' not found.");
+            }
         }
         else
         {
-            Debug.LogWarning("Error while loading file: File not found.");
+            Debug.LogWarning("Error while loading file: Directory '" + savesPath + "' not found.");
         }
 
-        Debug.Log("Loaded: " + savesPath);
-
-        return savedSessions[sessionIndex];
+        return savedSessions[0];
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public List<GameSession> LoadAll()
     {
+        DirectoryInfo dir = new DirectoryInfo(savesPath);
+        FileInfo[] fi = dir.GetFiles();
+
+        int count = fi.Length;
+
         savedSessions.Clear();
 
-        if (File.Exists(savesPath))
+        if (Directory.Exists(savesPath))
         {
-            file = File.Open(savesPath, FileMode.Open);
-            savedSessions = (List<GameSession>)binFormatter.Deserialize(file);
-            file.Close();
+            Debug.Log("Loading save files...");
+
+            for (int i = 0; i < count - 1; i++)
+            {
+                string fileName = fi[i].Directory.FullName;
+
+                if (File.Exists(fileName))
+                {
+                    file = File.Open(fileName, FileMode.Open);
+                    savedSessions.Add(((GameSession)binFormatter.Deserialize(file)));
+                    file.Close();
+                    Debug.Log(" -" + fileName);
+                }
+                else
+                {
+                    Debug.LogWarning("Error while loading file: File '" + fileName + "' not found.");
+                }
+
+            }
+
+            Debug.Log("Done!");
         }
         else
         {
-            Debug.LogWarning("Error while loading file: File not found.");
+            Debug.LogWarning("Error while loading file: Directory '"+ savesPath +"' not found.");
         }
-
-        Debug.Log("Loaded: " + savesPath);
 
         return savedSessions;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="settings"></param>
     public void SaveSettings(GameSettings settings)
     {
         tempSettings = new SavedSettings();
@@ -145,33 +218,30 @@ public class DataManager
 
         if (File.Exists(settingsPath))
         {
-            Debug.Log("Found save file, appending last save.");    //Need to check if we are in debug mode.
-
-            file = File.Open(settingsPath, FileMode.Append, FileAccess.Write);
-
+            File.Delete(settingsPath);
         }
-        else
-        {
-            Debug.Log("Save file not found, creating a new one and appending last save.");
 
-            file = File.Create(settingsPath);
-
-        }
+        file = File.Create(settingsPath);
 
         binFormatter.Serialize(file, tempSettings);
+
         file.Close();
 
         Debug.Log("Data settings to path: " + settingsPath);
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public GameSettings LoadSettings()
     {
         GameSettings retSettings = new GameSettings();
 
         tempSettings = null;
 
-        if (File.Exists(savesPath))
+        if (File.Exists(settingsPath))
         {
             file = File.Open(settingsPath, FileMode.Open);
             tempSettings = (SavedSettings)binFormatter.Deserialize(file);
@@ -190,7 +260,7 @@ public class DataManager
     }
 
     /// <summary>
-    /// Just bridge-function from ClassMerger.MergeClassProperties
+    /// Function used to merge different class types with same properties.
     /// </summary>
     /// <param name="from"></param>
     /// <param name="to"></param>
@@ -199,7 +269,11 @@ public class DataManager
         ClassMerger.MergeClassProperties(from, to);
     }
 
-    //DA SPOSTARE NELLO SCRIPT DI GESTIONE TELECAMERA E/O IN GLOBALS
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="camera"></param>
+    /// <returns></returns>
     private Texture2D CameraScreenshot(Camera camera)
     {
         // 4k = 3840 x 2160   FHD = 1920 x 1080
@@ -216,15 +290,17 @@ public class DataManager
         screenShot.ReadPixels(new Rect(0, 0, resWidth, resHeight), 0, 0);
 
         return screenShot;
-    }
+    }    //DA SPOSTARE NELLO SCRIPT DI GESTIONE TELECAMERA E/O IN GLOBALS
 
 }
 
-public static class ClassMerger
+/// <summary>
+/// 
+/// </summary>
+public class ClassMerger
 {
     /// <summary>
     /// Function used to merge different class types with same properties.
-    /// Mainly used to save monobeahaviour classes.
     /// </summary>
     /// <param name="copyFrom"></param>
     /// <param name="copyTo"></param>
@@ -249,11 +325,12 @@ public static class ClassMerger
         //Cicle trough each property of copyFrom, check if copyTo contains property then copy.
         foreach (FieldInfo field in copyFrom.GetType().GetFields(flags))
         {
+
             if (targetDic.ContainsKey(field.Name))
                 targetDic[field.Name].SetValue(copyTo, field.GetValue(copyFrom));
 
             else
-                throw new InvalidOperationException(string.Format("The field “{0}” has no corresponding field in the type “{1}”.", field.Name, copyTo.GetType().FullName));
+                Debug.LogWarning(string.Format("The field “{0}” has no corresponding field in the type “{1}”. Skipping field.", field.Name, copyTo.GetType().FullName));
 
         }
     }

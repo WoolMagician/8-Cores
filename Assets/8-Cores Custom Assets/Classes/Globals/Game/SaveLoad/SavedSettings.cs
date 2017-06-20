@@ -1,5 +1,5 @@
 [System.Serializable]
-public class SavedSettings : SavedBaseClass
+public class SavedSettings
 {
     public bool UseJoypad = true;
     public bool joypadTriggersAreButtons = false;

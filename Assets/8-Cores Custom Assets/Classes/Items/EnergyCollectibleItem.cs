@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class EnergyCollectibleItem : BaseCollectibleItem
+public class EnergyCollectibleItem : BaseCollectibleItemData
 {
 
     public float energyValue;

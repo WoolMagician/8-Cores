@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 [System.Serializable]
-public class SavedCharacter : SavedBaseClass
+public class SavedCharacter
 {
     public string characterName = "";
     public float health;

@@ -145,8 +145,8 @@ public class InventoryGUI : MonoBehaviour {
                     if (slot.item != null)
                     {
                         GUI.depth = 1;
-                        GUI.Label(new Rect((150 + p.x) - (iconWidthHeight / 2), (((Screen.height - 150) + p.y) - (iconWidthHeight / 2)), iconWidthHeight, iconWidthHeight), slot.item.item2DTexture);
-                        GUI.Label(new Rect((150 + p.x) + (iconWidthHeight / 2) - 20, ((Screen.height - 150) + p.y) + (iconWidthHeight / 2) - 25, iconWidthHeight, iconWidthHeight), slot.currentSlotValue.ToString());
+                        //GUI.Label(new Rect((150 + p.x) - (iconWidthHeight / 2), (((Screen.height - 150) + p.y) - (iconWidthHeight / 2)), iconWidthHeight, iconWidthHeight), slot.item.item2DTexture);
+                        //GUI.Label(new Rect((150 + p.x) + (iconWidthHeight / 2) - 20, ((Screen.height - 150) + p.y) + (iconWidthHeight / 2) - 25, iconWidthHeight, iconWidthHeight), slot.currentSlotValue.ToString());
                     }
                 }
             }

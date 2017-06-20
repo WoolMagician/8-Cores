@@ -1,8 +1,14 @@
 using UnityEngine;
 using System.Collections;
 
+[System.Serializable]
 public class SavedBaseClass
 {
-    public Vector3 position = Vector3.zero;
-    public Vector3 rotation = Vector3.zero;
+    public float posX;
+    public float posY;
+    public float posZ;
+
+    public float rotX;
+    public float rotY;
+    public float rotZ;
 }

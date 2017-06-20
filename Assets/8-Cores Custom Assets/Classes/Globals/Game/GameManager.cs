@@ -1,29 +1,35 @@
 using UnityEngine;
 
-[System.Serializable]
 public class GameManager : MonoBehaviour
 {
     //Manca la parte di scelta sessione da parte dell'utente.
     //Il campo 'currentSessionIndex' deve essere riempito puntando all'ID della sessione scelta dall'utente.
     //Se si crea un nuovo gioco, abilitare la booleana newGame.
 
-    [HideInInspector]
-    public GameSession[] allSessions = new GameSession[5];    //Tutti i salvataggi fatti fin'ora
-    public GameSession currentSession;
-    public GameSession tempSession;    //Sessione temporanea di appoggio per il salvataggio/caricamento dati.
-    public DataManager dataManager;
-    public GameSettings gameSettings = new GameSettings();
+    //[HideInInspector]
+    private GameSession[] allSessions = new GameSession[5];    //Tutti i salvataggi fatti fin'ora
+    private GameSession tempSession;    //Sessione temporanea di appoggio per il salvataggio/caricamento dati.
+    private GameSettings gameSettings = new GameSettings();
 
     private BaseCharacter tempChar;
+    //private Inventory tempInventory;   
+
+    public static DataManager dataManager;
+
     public int sessionToLoadIndex = 0;
     public int currentSessionIndex = 0;
     public bool newGame = false;
+
+    public GameSession currentSession;
 
     // Use this for initialization
     void Start()
     {
         dataManager = new DataManager(this);
-        allSessions = dataManager.Initialize();
+        dataManager.Initialize();
+
+        allSessions = dataManager.LoadAll().ToArray();
+        gameSettings = dataManager.LoadSettings();
 
         if (allSessions.Length > 0)
         {
@@ -31,14 +37,17 @@ public class GameManager : MonoBehaviour
 
             //SELEZIONE SESSIONE
             currentSession = allSessions[currentSessionIndex];
+            currentSession.Update(dataManager);
         }
         else
         {
+            currentSession = new GameSession();
+            currentSession.savedInventory = new InventoryData(20, 4);
             //NEW GAME NEEDED.
         }
 
         //tempSession = new GameSession();
-        //tempChar = GameObject.FindGameObjectWithTag("Player").GetComponent<BaseCharacter>();
+        tempChar = GameObject.FindGameObjectWithTag("Player").GetComponent<BaseCharacter>();
 
         //dataManager.MergeClassProperties(tempChar, tempSession.character);
         
@@ -49,14 +58,15 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F3))
         {
+            tempSession = currentSession;
+
             dataManager.Save(tempSession);
 
         }
         else if (Input.GetKeyDown(KeyCode.F4))
         {
-            tempSession = dataManager.Load(sessionToLoadIndex);
-
-            dataManager.MergeClassProperties(tempSession.character, tempChar);
+            currentSession = dataManager.Load(sessionToLoadIndex);
+            currentSession.Update(dataManager);
 
         }
 

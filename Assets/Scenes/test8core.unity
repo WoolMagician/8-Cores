@@ -13076,19 +13076,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f75abd495c02c8749beefa8b58e133b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tempSession:
-    ID: 0
-    character:
-      characterName: 
-      health: 0
-      walkSpeed: 0
-      runSpeed: 0
-      jumpSpeed: 0
-      jumpForce: 0
-      isSelected: 0
-  sessionToLoadIndex: 0
   allSessions:
   - ID: 0
+    inventory:
+      slotList: []
+      currentJunks: 0
+      openInventoryButton: 
+      openInventoryKey: 
+      isInvOpened: 0
+      isQuickOpened: 1
+      maxSlotNumber: 0
+      quickAccessSlotNumber: 0
+      items: []
     character:
       characterName: 
       health: 0
@@ -13098,6 +13097,16 @@ MonoBehaviour:
       jumpForce: 0
       isSelected: 0
   - ID: 0
+    inventory:
+      slotList: []
+      currentJunks: 0
+      openInventoryButton: 
+      openInventoryKey: 
+      isInvOpened: 0
+      isQuickOpened: 1
+      maxSlotNumber: 0
+      quickAccessSlotNumber: 0
+      items: []
     character:
       characterName: 
       health: 0
@@ -13107,6 +13116,16 @@ MonoBehaviour:
       jumpForce: 0
       isSelected: 0
   - ID: 0
+    inventory:
+      slotList: []
+      currentJunks: 0
+      openInventoryButton: 
+      openInventoryKey: 
+      isInvOpened: 0
+      isQuickOpened: 1
+      maxSlotNumber: 0
+      quickAccessSlotNumber: 0
+      items: []
     character:
       characterName: 
       health: 0
@@ -13116,6 +13135,16 @@ MonoBehaviour:
       jumpForce: 0
       isSelected: 0
   - ID: 0
+    inventory:
+      slotList: []
+      currentJunks: 0
+      openInventoryButton: 
+      openInventoryKey: 
+      isInvOpened: 0
+      isQuickOpened: 1
+      maxSlotNumber: 0
+      quickAccessSlotNumber: 0
+      items: []
     character:
       characterName: 
       health: 0
@@ -13125,6 +13154,16 @@ MonoBehaviour:
       jumpForce: 0
       isSelected: 0
   - ID: 0
+    inventory:
+      slotList: []
+      currentJunks: 0
+      openInventoryButton: 
+      openInventoryKey: 
+      isInvOpened: 0
+      isQuickOpened: 1
+      maxSlotNumber: 0
+      quickAccessSlotNumber: 0
+      items: []
     character:
       characterName: 
       health: 0
@@ -13133,6 +13172,81 @@ MonoBehaviour:
       jumpSpeed: 0
       jumpForce: 0
       isSelected: 0
+  currentSession:
+    ID: 0
+    inventory:
+      slotList: []
+      currentJunks: 0
+      openInventoryButton: 
+      openInventoryKey: 
+      isInvOpened: 0
+      isQuickOpened: 1
+      maxSlotNumber: 0
+      quickAccessSlotNumber: 0
+      items: []
+    character:
+      characterName: 
+      health: 0
+      walkSpeed: 0
+      runSpeed: 0
+      jumpSpeed: 0
+      jumpForce: 0
+      isSelected: 0
+  tempSession:
+    ID: 0
+    inventory:
+      slotList: []
+      currentJunks: 0
+      openInventoryButton: 
+      openInventoryKey: 
+      isInvOpened: 0
+      isQuickOpened: 1
+      maxSlotNumber: 0
+      quickAccessSlotNumber: 0
+      items: []
+    character:
+      characterName: 
+      health: 0
+      walkSpeed: 0
+      runSpeed: 0
+      jumpSpeed: 0
+      jumpForce: 0
+      isSelected: 0
+  gameSettings:
+    UseJoypad: 0
+    joypadTriggersAreButtons: 0
+    startButton: 
+    selectButton: 
+    r1: 
+    l1: 
+    r3: 
+    l3: 
+    buttonA: 
+    buttonB: 
+    buttonX: 
+    buttonY: 
+    dPadButtonUp: 
+    dPadButtonDown: 
+    dPadButtonRight: 
+    dPadButtonLeft: 
+    rightPadX: 
+    rightPadY: 
+    leftPadX: 
+    leftPadY: 
+    r2: 
+    l2: 
+    dPadAxisUp: 
+    dPadAxisDown: 
+    dPadAxisRight: 
+    dPadAxisLeft: 
+    jumpButton: 
+    movementX: 
+    movementY: 
+    cameraX: 
+    cameraY: 
+  sessionToLoadIndex: 0
+  currentSessionIndex: 0
+  newGame: 0
 --- !u!4 &942956218
 Transform:
   m_ObjectHideFlags: 0

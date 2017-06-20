@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityStandardAssets.ImageEffects;
 using UnityEngine;
 
-public class Inventory : MonoBehaviour {
+[System.Serializable]
+public class InventoryData
+{
     //[HideInInspector]
-    public List<InventorySlot> slotList = new List<InventorySlot>();
+    public SerializableDictionary<int, InventorySlot> slotList = new SerializableDictionary<int, InventorySlot>();
 
     public int currentJunks = 0;
 
@@ -15,7 +17,7 @@ public class Inventory : MonoBehaviour {
     [HideInInspector]
     public string openInventoryKey = "";
 
-    public Texture2D quickSlotTexture;
+    //public Texture2D quickSlotTexture;
 
     public bool isInvOpened = false;
 
@@ -25,31 +27,29 @@ public class Inventory : MonoBehaviour {
 
     public int quickAccessSlotNumber;
 
-    public BlurOptimized blur;
+    //public BlurOptimized blur;
 
-    public BaseCollectibleItem[] items;
+    public BaseCollectibleItemData[] items;
 
-    public void Start()
+    public InventoryData(int slotNumber, int quickAccessSlotNumber)
     {
-        maxSlotNumber = 20;
+        slotNumber = 20;
         quickAccessSlotNumber = 4;
 
-        blur = Camera.main.GetComponent<BlurOptimized>();
-        blur.enabled = isInvOpened;
+        //blur = Camera.main.GetComponent<BlurOptimized>();
+        //blur.enabled = isInvOpened;
 
-
-
-        for (int i = 0; i < quickAccessSlotNumber; i++)
+        //Initialize inventory slots.
+        for (int i = 0; i < slotNumber; i++)
         {
             InventorySlot tempSlot = new InventorySlot();
 
-            tempSlot.quickAccess = true;
+            tempSlot.quickAccess = false;
+            tempSlot.item = new BaseCollectibleItemData();
+            tempSlot.ID = i;
+            tempSlot.currentSlotValue = 0;
 
-            tempSlot.itemOld = items[i];
-
-            tempSlot.currentSlotValue = Random.Range(1,10);
-
-            slotList.Add(tempSlot);
+            slotList.Add(tempSlot.ID, tempSlot);
         }
 
     }
@@ -60,7 +60,7 @@ public class Inventory : MonoBehaviour {
         {
             isQuickOpened = isInvOpened;
             isInvOpened = !isInvOpened;
-            blur.enabled = isInvOpened;
+            //blur.enabled = isInvOpened;
 
             if (isInvOpened)
             {
@@ -72,11 +72,7 @@ public class Inventory : MonoBehaviour {
                 Time.timeScale = 1;
             }
         }
-
-
-
-
-
+        
         //if (Input.GetKey("q") && !isInvOpened)//|| Input.GetButtonDown(openInventoryButton))
         //{
         //    isQuickOpened = true;
@@ -87,23 +83,23 @@ public class Inventory : MonoBehaviour {
         //}
     }
 
-    public ActionResult AddItem(BaseCollectibleItem objectToAdd)
+    public ActionResult AddItem(BaseCollectibleItemData objectToAdd)
     {
         bool needNewItemSlot = true;
-        
-        foreach (InventorySlot slot in slotList)
+
+        foreach (KeyValuePair<int, InventorySlot> slot in slotList)
         {
-            if (!slot.quickAccess)
+            if (!slot.Value.quickAccess)
             {
-                if (slot.itemOld.type == objectToAdd.type)
+                if (slot.Value.item.type == objectToAdd.type)
                 {
-                    if (!slot.slotFull)
+                    if (!slot.Value.slotFull)
                     {
                         needNewItemSlot = false;
 
-                        slot.currentSlotValue += 1;
+                        slot.Value.currentSlotValue += 1;
 
-                        slot.CheckMaxValue();
+                        slot.Value.CheckMaxValue();
 
                         Debug.Log("PICKED UP OBJECT!");
 
@@ -113,7 +109,7 @@ public class Inventory : MonoBehaviour {
             }
 
         }
-        
+
         if (needNewItemSlot)
         {
             int slotCounter = 0;
@@ -124,11 +120,11 @@ public class Inventory : MonoBehaviour {
                 return ActionResult.InventoryFull;
             }
 
-            foreach (InventorySlot slot1 in slotList)
+            foreach (KeyValuePair<int, InventorySlot> slot1 in slotList)
             {
-                if (!slot1.quickAccess)
+                if (!slot1.Value.quickAccess)
                 {
-                    if (slot1.itemOld.type == objectToAdd.type)
+                    if (slot1.Value.item.type == objectToAdd.type)
                     {
                         slotCounter += 1;
                     }
@@ -143,9 +139,9 @@ public class Inventory : MonoBehaviour {
 
                     tempSlot.currentSlotValue = 1;
 
-                    tempSlot.itemOld = objectToAdd;
+                    tempSlot.item = objectToAdd;
 
-                    slotList.Add(tempSlot);
+                    slotList.Add(slotList.Count, tempSlot);
 
                     Debug.Log("NEW SLOT CREATED!");
 
@@ -170,27 +166,27 @@ public class Inventory : MonoBehaviour {
     }
 
     //DA RICONTROLLARE, MODIFICATO IL 12/06/2017
-    public ActionResult RemoveItem(BaseCollectibleItem.Type itemToRemove, int quantity)
+    public ActionResult RemoveItem(BaseCollectibleItemData.Type itemToRemove, int quantity)
     {
-        foreach (InventorySlot slot in slotList)
+        foreach (KeyValuePair<int, InventorySlot> slot in slotList)
         {
-            if (slot.itemOld.type == itemToRemove)
+            if (slot.Value.item.type == itemToRemove)
             {
-                if (slot.currentSlotValue >= quantity)
+                if (slot.Value.currentSlotValue >= quantity)
                 {
 
                     //if (quantity < slot.currentSlotValue)
                     //{
-                        slot.currentSlotValue -= quantity;
+                    slot.Value.currentSlotValue -= quantity;
 
-                        Debug.Log(slot.currentSlotValue);
+                    Debug.Log(slot.Value.currentSlotValue);
 
-                        if (slot.currentSlotValue == 0)
-                        {
-                            slotList.Remove(slot);
-                        }
+                    if (slot.Value.currentSlotValue == 0)
+                    {
+                        slotList.Remove(slot);
+                    }
 
-                        return ActionResult.Success;
+                    return ActionResult.Success;
 
                     //}
 
@@ -225,7 +221,7 @@ public class Inventory : MonoBehaviour {
         {
             ArrangeRapidAccessSlots();
         }
-        
+
     }
 
     public void ArrangeRapidAccessSlots()
@@ -245,9 +241,11 @@ public class Inventory : MonoBehaviour {
             p.y = (circleRadius * Mathf.Sin((angleIncrement * i) * (Mathf.PI / 180)));
 
             GUI.depth = 2;
-            GUI.Label(new Rect((150 + p.x) - (20 / 2), (((Screen.height - 150) + p.y) - (20 / 2)), 20, 20), quickSlotTexture);
+            //GUI.Label(new Rect((150 + p.x) - (20 / 2), (((Screen.height - 150) + p.y) - (20 / 2)), 20, 20), quickSlotTexture);
 
         }
     }
 
 }
+
+

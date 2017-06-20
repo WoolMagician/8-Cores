@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class BaseCollectibleItem : MonoBehaviour
+public class BaseCollectibleItemData
 {
     public string itemName;
     public int itemID = -1;

@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class GameSettings : MonoBehaviour
+[System.Serializable]
+public class GameSettings
 {
     [Header("General Settings", order = 0)]
     public bool UseJoypad = true;
