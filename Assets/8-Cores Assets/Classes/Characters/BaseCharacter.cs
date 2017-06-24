@@ -3,7 +3,7 @@ using UnityEngine;
 [System.Serializable]
 public class BaseCharacter : MonoBehaviour
 {
-    public string characterName = "";
+    public string characterName = "Podda";
 
     public float health;
     public float walkSpeed;

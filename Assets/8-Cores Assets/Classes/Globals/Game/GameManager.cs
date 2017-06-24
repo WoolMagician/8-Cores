@@ -1,24 +1,50 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEditor;
 using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Collections;
-using UnityEngine;
 
-/// <summary>
-/// 
-/// </summary>
-public class DataManager
+
+public class GameManager : MonoBehaviour
 {
+    //DA FINIRE LOADING SESSION
+    public GameSession[] allSessions = new GameSession[5];    //Tutti i salvataggi fatti fin'ora
+    private GameSession tempSession;    //Sessione temporanea di appoggio per il salvataggio/caricamento dati.
+    private GameSettings gameSettings = new GameSettings();
+    private BaseCharacter tempChar;
+
+    private int screenWidth = Screen.width;
+    private int screenHeight = Screen.height;
+    private int sessionToLoadIndex;
+
+    [HideInInspector]
+    public bool newGame = false;
+
+    [HideInInspector]
+    public bool isLoading = false;
+
+    [HideInInspector]
+    public bool isSaving = false;
+
+    //Da commentare
+    public static DataManager dataManager;
+    public MainGUI mainGUI;
+    public LoadingScreen loadingScreen;
+    public GameSession currentSession;
+
+    //DATAMANGER VARS
     //All savable classes
     private SavedCharacter tempCharacter;
     private SavedInventory tempInventory;
     private SavedEnvironment tempEnvironment;
     private SavedSettings tempSettings;
 
-    private GameManager gameManager;
+    public GameManager gameManager;
     private BinaryFormatter binFormatter = new BinaryFormatter();
     private FileStream file = null;
     private static string settingsPath = Application.persistentDataPath + "/settings.ecd";
@@ -26,20 +52,13 @@ public class DataManager
     private static string dateTimeFormatString = "ddMMyyyyHHmmss";
     private static List<GameSession> savedSessions = new List<GameSession>();
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="gm"></param>
-    public DataManager(GameManager gm)
-    {
-        this.gameManager = gm;
-    }
 
     /// <summary>
     /// 
     /// </summary>
-    public void Initialize()
+    void Start()
     {
+        //Creates Saves directory and base settings file.
         if (!Directory.Exists(Application.persistentDataPath + "/Saves"))
         {
             Directory.CreateDirectory(Application.persistentDataPath + "/Saves");
@@ -49,13 +68,169 @@ public class DataManager
         {
             File.Create(Application.persistentDataPath + "/settings.ecd");
         }
+
+        //Load all sessions, user will chose wich one to load.
+        allSessions = LoadAllSessions().ToArray();
+
+        //Load settings.
+        gameSettings = LoadSettings();
+
+        sessionToLoadIndex = -1;
+
+        //Check if there are any save files and let user chose.
+        if (allSessions.Length < 1)
+        { 
+            //NEW GAME NEEDED.
+            newGame = true;
+            mainGUI.continueGameButton.gameObject.SetActive(false);
+
+        }
+
+        //texture2.LoadImage(texture.EncodeToPNG());
+
+        //mainMenu.optionsButton.onClick.AddListener(ShowOptionsMenu);
+        //UnityEngine.Object prefab = AssetDatabase.LoadAssetAtPath("Assets/8-Cores Custom Assets/Prefabs/LoadingScreen.prefab", typeof(GameObject));
+        //GameObject clone = Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
+        //clone.name = "LoadingScreen";
+
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            StartCoroutine(Save());
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.F11))
+        {
+            SaveSettings(gameSettings);
+
+        }
+
+        else if (Input.GetKeyDown(KeyCode.F12))
+        {
+            gameSettings = LoadSettings();
+
+        }
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void NewGame()  //FUNZIONE DEL RESET TOTALE GLOBALE DE CRISTO
+    {
+        if (newGame)
+        {
+            currentSession = new GameSession();
+
+            //currentSession.character = new SavedCharacter();
+
+            tempSession = currentSession;
+            SaveSession(tempSession);
+
+            Debug.Log("New game created!");
+        }
+        else
+        {
+            //WE SHOULD NEVER GET HERE!
+            Debug.LogError("GameManager.cs: NewGame() function error!");
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void LoadGame()
+    {
+        if(sessionToLoadIndex > -1)
+        {
+            currentSession = LoadSession(sessionToLoadIndex);
+            currentSession.Update(this);
+
+        }
+        else
+        {
+            //WE SHOULD NEVER GET HERE!
+            Debug.LogError("GameManager.cs: LoadGame() function error!");
+        }
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="flag"></param>
+    private void ShowOptionsMenu(bool flag)
+    {
+        //mainMenu.optionsMenu.gameObject.SetActive(!);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="flag"></param>
+    private void ShowSelectSaveMenu(bool flag)
+    {
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator Save()   //WE SHOULD CHECK SAVING FUNCTION ACKNOWLEDGE MADONNADDIO
+    {
+        //PUT FUNC SHOW SAVING IN PROGRESS.
+
+        isSaving = true;
+
+        //Using lambda expression to return values from SaveMiniature iterator.
+        yield return SaveMiniature(value => currentSession.miniature = value);
+
+        //Using a temporary session for saving.
+        tempSession = currentSession;
+
+        //Save session with index increased.
+        SaveSession(tempSession);
+
+        //Update sessions list.
+        allSessions = LoadAllSessions().ToArray();
+
+        isSaving = false;
+
+        //PUT FUNC SHOW SAVING COMPLETE.
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public IEnumerator SaveMiniature(System.Action<byte[]> result)
+    {
+        //Waiting for end of current frame.
+        yield return new WaitForEndOfFrame();
+        
+        //Creating temporary texture to store miniature.
+        Texture2D miniature = new Texture2D(screenWidth, screenHeight, TextureFormat.RGB24, false);
+
+        //Here is where the image is really captured from screen.
+        miniature.ReadPixels(new Rect(0, 0, screenWidth, screenHeight), 0, 0);
+        miniature.Apply();
+
+        //Return image encoded in byte array.
+        result(miniature.EncodeToPNG());
+
     }
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="session"></param>
-    public void Save(GameSession session)
+    public void SaveSession(GameSession session)
     {
         try
         {
@@ -70,7 +245,7 @@ public class DataManager
 
             file.Close();
 
-            Debug.Log("Saved new session -ID: " + savedSessions[0].ID +  "- to path: " + savesPath + "/SAV_" + DateTime.Now.ToString(dateTimeFormatString) + ".ecd");
+            Debug.Log("Saved new session -ID: " + savedSessions[0].ID + "- to path: " + savesPath + "/SAV_" + DateTime.Now.ToString(dateTimeFormatString) + ".ecd");
 
         }
         catch (System.Exception)
@@ -84,7 +259,7 @@ public class DataManager
     /// 
     /// </summary>
     /// <returns></returns>
-    public GameSession Load(int index)
+    public GameSession LoadSession(int index)
     {
         DirectoryInfo dir = new DirectoryInfo(savesPath);
         FileInfo[] fi = dir.GetFiles();
@@ -110,11 +285,11 @@ public class DataManager
                     if (tempSessionList[0].ID == index)
                     {
                         Debug.Log("Loaded: " + fileName);
-                        returnGameSession =  tempSessionList[0];
+                        returnGameSession = tempSessionList[0];
 
                         continue;
                     }
-                    
+
                 }
                 else
                 {
@@ -138,7 +313,7 @@ public class DataManager
     /// 
     /// </summary>
     /// <returns></returns>
-    public List<GameSession> LoadAll()
+    public List<GameSession> LoadAllSessions()
     {
         DirectoryInfo dir = new DirectoryInfo(savesPath);
         FileInfo[] fi = dir.GetFiles();
@@ -180,7 +355,7 @@ public class DataManager
         }
         else
         {
-            Debug.LogWarning("Error while searching files: Directory '"+ savesPath +"' not found.");
+            Debug.LogWarning("Error while searching files: Directory '" + savesPath + "' not found.");
         }
 
         return savedSessions;
@@ -195,11 +370,6 @@ public class DataManager
         tempSettings = new SavedSettings();
 
         MergeClassProperties(settings, tempSettings);
-
-        if (File.Exists(settingsPath))
-        {
-            File.Delete(settingsPath);
-        }
 
         file = File.Create(settingsPath);
 
@@ -261,6 +431,15 @@ public class DataManager
 
         return fi.Length;
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="index"></param>
+    public void UpdateSessionToLoadIndex(int index)
+    {
+        sessionToLoadIndex = index;
+    }
 }
 
 /// <summary>
@@ -299,72 +478,8 @@ public class ClassMerger
                 targetDic[field.Name].SetValue(copyTo, field.GetValue(copyFrom));
 
             else
-                Debug.LogWarning(string.Format("The field “{0}” has no corresponding field in the type “{1}”. Skipping field.", field.Name, copyTo.GetType().FullName));
+                Debug.LogWarning(string.Format("The field �{0}� has no corresponding field in the type �{1}�. Skipping field.", field.Name, copyTo.GetType().FullName));
 
         }
     }
-
-    //PORCODDIO TROPPO CODICE INUTILE
-
-    //public static void MergeToFrom(ref object copyTo, object copyFrom)
-    //{
-    //    var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-
-    //    var targetDic = copyTo.GetType().GetFields(flags).ToDictionary(f => f.Name);
-
-    //    foreach (var f in copyFrom.GetType().GetFields(flags))
-    //    {
-    //        if (targetDic.ContainsKey(f.Name))
-    //            targetDic[f.Name].SetValue(copyTo, f.GetValue(copyFrom));
-
-    //        else
-    //            throw new InvalidOperationException(string.Format("The field “{0}” has no corresponding field in the type “{1}”.", f.Name, copyTo.GetType().FullName));
-
-    //    }
-    //}
-
-    //public static TTarget MergeMonoBehaviour<TTarget>(object copyFrom, object copyTo) where TTarget : new()
-    //{
-    //    var flags = BindingFlags.Instance | BindingFlags.Public |
-    //            BindingFlags.NonPublic;
-
-    //    var targetDic = typeof(TTarget).GetFields(flags).ToDictionary(f => f.Name);
-
-
-    //        foreach (var f in copyFrom.GetType().GetFields(flags))
-    //        {
-    //            if (targetDic.ContainsKey(f.Name))
-    //                targetDic[f.Name].SetValue(copyTo, f.GetValue(copyFrom));
-    //            else
-    //                throw new InvalidOperationException(string.Format(
-    //                    "The field “{0}” has no corresponding field in the type “{1}”.",
-    //                    f.Name, typeof(TTarget).FullName));
-    //        }
-
-    //    return 0;
-    //}
-
-    //var flags = BindingFlags.Instance | BindingFlags.Public |
-    //        BindingFlags.NonPublic;
-    //var targetDic = typeof(TTarget).GetFields(flags).ToDictionary(f => f.Name);
-
-    //    if (isMono)
-    //    {
-    //        //var ret = new TTarget();
-
-    //        UnityEngine.Object ret2;
-
-
-    //        foreach (var f in copyFrom.GetType().GetFields(flags))
-    //        {
-    //            if (targetDic.ContainsKey(f.Name))
-    //                targetDic[f.Name].SetValue(ret, f.GetValue(copyFrom));
-    //            else
-    //                throw new InvalidOperationException(string.Format(
-    //                    "The field “{0}” has no corresponding field in the type “{1}”.",
-    //                    f.Name, typeof(TTarget).FullName));
-    //        }
-
-    //        return ret;
-    //    }
 }

@@ -11,6 +11,7 @@ TagManager:
   - Enemy
   - Environment
   - Inventory
+  - SaveSlot
   layers:
   - Default
   - TransparentFX
