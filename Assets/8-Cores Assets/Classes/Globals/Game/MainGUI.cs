@@ -16,8 +16,6 @@ public class MainGUI : MonoBehaviour
 
     public void PopulateSaveList(GameManager gameManager)
     {
-        Debug.Log("test");
-
         int count;
 
         count = gameManager.allSessions.Length;
@@ -41,9 +39,11 @@ public class MainGUI : MonoBehaviour
 
             tempSaveSlotGUI.miniature.texture = tempMiniature;
 
-            tempSaveSlotGUI.playerName.text = gameManager.allSessions[i].character.characterName;
+            tempSaveSlotGUI.miniature.color = Color.white;
 
-            tempSaveSlotGUI.dateTime.text = gameManager.allSessions[i].lastActivityDate.ToString("dd/MM/yyyy HH:mm:ss");
+            tempSaveSlotGUI.characterName.text = "Character: " + gameManager.allSessions[i].character.characterName;
+
+            tempSaveSlotGUI.dateTime.text = "Save date: " + gameManager.allSessions[i].lastActivityDate;
 
         }
     }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityStandardAssets.ImageEffects;
 
 
 public class GameManager : MonoBehaviour
@@ -44,13 +45,15 @@ public class GameManager : MonoBehaviour
     private SavedEnvironment tempEnvironment;
     private SavedSettings tempSettings;
 
-    public GameManager gameManager;
     private BinaryFormatter binFormatter = new BinaryFormatter();
     private FileStream file = null;
-    private static string settingsPath = Application.persistentDataPath + "/settings.ecd";
-    private static string savesPath = Application.persistentDataPath + "/Saves";
+    private static string settingsPath;
+    private static string savesPath;
     private static string dateTimeFormatString = "ddMMyyyyHHmmss";
     private static List<GameSession> savedSessions = new List<GameSession>();
+    public RenderTexture test;
+
+    private Camera mainCamera;
 
 
     /// <summary>
@@ -58,6 +61,10 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void Start()
     {
+        mainCamera = Camera.main;
+        settingsPath = Application.persistentDataPath + "/settings.ecd";
+        savesPath = Application.persistentDataPath + "/Saves";
+
         //Creates Saves directory and base settings file.
         if (!Directory.Exists(Application.persistentDataPath + "/Saves"))
         {
@@ -211,15 +218,34 @@ public class GameManager : MonoBehaviour
     /// <returns></returns>
     public IEnumerator SaveMiniature(System.Action<byte[]> result)
     {
+        RenderTexture renderTexture;
+        Texture2D miniature;
+        BlurOptimized blur;
+
         //Waiting for end of current frame.
         yield return new WaitForEndOfFrame();
-        
-        //Creating temporary texture to store miniature.
-        Texture2D miniature = new Texture2D(screenWidth, screenHeight, TextureFormat.RGB24, false);
 
-        //Here is where the image is really captured from screen.
-        miniature.ReadPixels(new Rect(0, 0, screenWidth, screenHeight), 0, 0);
+        blur = mainCamera.GetComponent<BlurOptimized>();
+
+        renderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
+        renderTexture.useMipMap = false;
+        renderTexture.antiAliasing = 1;
+
+        RenderTexture.active = renderTexture;
+        mainCamera.targetTexture = renderTexture;
+
+        miniature = new Texture2D(Screen.width, Screen.height, TextureFormat.ARGB32, false);
+        blur.enabled = false; //Disable blur temporarly just for shot.
+
+        mainCamera.Render();
+        miniature.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, false);
+
+        blur.enabled = true;
         miniature.Apply();
+
+        mainCamera.targetTexture = null;
+        RenderTexture.active = null;
+        Destroy(renderTexture);
 
         //Return image encoded in byte array.
         result(miniature.EncodeToPNG());
@@ -439,6 +465,11 @@ public class GameManager : MonoBehaviour
     public void UpdateSessionToLoadIndex(int index)
     {
         sessionToLoadIndex = index;
+    }
+
+    public void PopulateSaveList()
+    {
+        mainGUI.PopulateSaveList(this);
     }
 }
 

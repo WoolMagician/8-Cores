@@ -6,16 +6,18 @@ using System;
 public class GameSession
 {
     public int ID;
-    public DateTime lastActivityDate;
+    public string lastActivityDate;
     public InventoryData inventory;
     public SavedCharacter character;
     public SavedEnvironment environment;
+
+    [HideInInspector]
     public byte[] miniature;
 
     public GameSession()
     {
         this.ID = 0;
-        this.lastActivityDate = DateTime.Now;
+        this.lastActivityDate = DateTime.Now.ToString();
         this.inventory = new InventoryData(20, 4);
         this.character = new SavedCharacter();
         this.miniature = new byte[] { 0 };
@@ -34,7 +36,7 @@ public class GameSession
         BaseCharacter tempCharacter = GameObject.FindGameObjectWithTag("Player").GetComponent<BaseCharacter>();
         gameManager.MergeClassProperties(tempCharacter, character);
 
-        this.lastActivityDate = DateTime.Now;
+        this.lastActivityDate = DateTime.Now.ToString();
         this.ID = gameManager.GetSavesNumber();
 
         //dataManager.gameManager.TakeSessionSaveScreenshot(this);
