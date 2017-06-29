@@ -1,8 +1,10 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using UnityStandardAssets.ImageEffects;
 
+/// <summary>
+/// 
+/// </summary>
 public class SwapWeaponManager : MonoBehaviour
 {
     [HideInInspector]
@@ -18,20 +20,17 @@ public class SwapWeaponManager : MonoBehaviour
     public GameObject player;
 
     public BaseWeapon[] weaponsHolder;
-
     public GameObject swapEffect;
-
     public GameObject[] swapEffectIstanceHolder;
-
     public Material wireframeMat = null;
 
     private Material weaponMat = null;
-
     private int currentSelectedWeaponID = 0;
-
     private List<BaseWeapon> weaponList = new List<BaseWeapon>();
 
-    // Use this for initialization
+    /// <summary>
+    /// 
+    /// </summary>
     void Start()
     {
         weaponList.AddRange(weaponsHolder);
@@ -56,7 +55,9 @@ public class SwapWeaponManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// 
+    /// </summary>
     void Update()
     {
         if (Input.GetKey(KeyCode.Tab))

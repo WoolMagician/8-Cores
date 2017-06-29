@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityStandardAssets.ImageEffects;
 using UnityEngine;
 
-public class Inventory : MonoBehaviour {
+public class InventoryOld : MonoBehaviour {
     //[HideInInspector]
     public List<InventorySlot> slotList = new List<InventorySlot>();
 
@@ -43,11 +43,11 @@ public class Inventory : MonoBehaviour {
         {
             InventorySlot tempSlot = new InventorySlot();
 
-            tempSlot.quickAccess = true;
+            //tempSlot.quickAccess = true;
 
             tempSlot.itemOld = items[i];
 
-            tempSlot.currentSlotValue = Random.Range(1,10);
+            tempSlot.value = Random.Range(1,10);
 
             slotList.Add(tempSlot);
         }
@@ -93,24 +93,22 @@ public class Inventory : MonoBehaviour {
         
         foreach (InventorySlot slot in slotList)
         {
-            if (!slot.quickAccess)
-            {
+            //if (!slot.quickAccess)
+            //{
                 if (slot.itemOld.type == objectToAdd.type)
                 {
-                    if (!slot.slotFull)
+                    if (!slot.isFull)
                     {
                         needNewItemSlot = false;
 
-                        slot.currentSlotValue += 1;
-
-                        slot.CheckMaxValue();
+                        slot.value += 1;
 
                         Debug.Log("PICKED UP OBJECT!");
 
                         return ActionResult.Success;
                     }
                 }
-            }
+            //}
 
         }
         
@@ -126,13 +124,13 @@ public class Inventory : MonoBehaviour {
 
             foreach (InventorySlot slot1 in slotList)
             {
-                if (!slot1.quickAccess)
-                {
+                //if (!slot1.quickAccess)
+                //{
                     if (slot1.itemOld.type == objectToAdd.type)
                     {
                         slotCounter += 1;
                     }
-                }
+                //}
             }
 
             if (slotCounter < objectToAdd.maxStackNumber)
@@ -141,7 +139,7 @@ public class Inventory : MonoBehaviour {
                 {
                     InventorySlot tempSlot = new InventorySlot();
 
-                    tempSlot.currentSlotValue = 1;
+                    tempSlot.value = 1;
 
                     tempSlot.itemOld = objectToAdd;
 
@@ -176,16 +174,16 @@ public class Inventory : MonoBehaviour {
         {
             if (slot.itemOld.type == itemToRemove)
             {
-                if (slot.currentSlotValue >= quantity)
+                if (slot.value >= quantity)
                 {
 
-                    //if (quantity < slot.currentSlotValue)
+                    //if (quantity < slot.currentSlotValue) //Controllo ridondante
                     //{
-                        slot.currentSlotValue -= quantity;
+                        slot.value -= quantity;
 
-                        Debug.Log(slot.currentSlotValue);
+                        Debug.Log(slot.value);
 
-                        if (slot.currentSlotValue == 0)
+                        if (slot.value == 0)
                         {
                             slotList.Remove(slot);
                         }

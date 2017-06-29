@@ -9,7 +9,7 @@ public class JunkCollectibleItem : BaseCollectibleItemData
     public GameObject inventoryGameObject;
 
     [HideInInspector]
-    public Inventory inventoryCopy;
+    public InventoryOld inventoryCopy;
 
     //private void Start()
     //{

@@ -5,7 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
-    path: Assets/test8core.unity
-  - enabled: 1
+  - enabled: 0
     path: Assets/testroom.unity
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: Assets/test8core.unity
+    guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/Scenes/test8core.unity
+    guid: 13bc917f6bebff746bbfa2d8811fd5da
+  - enabled: 1
+    path: Assets/test.unity
+    guid: a6366625c1bae49439e0d81d55a8464f
+  - enabled: 1
+    path: Assets/testscene.unity
+    guid: 1efcbf47a1ae35846b28e5b69ce3c51a

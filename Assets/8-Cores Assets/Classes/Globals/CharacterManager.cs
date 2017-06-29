@@ -2,11 +2,12 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-[System.Serializable]
+/// <summary>
+/// 
+/// </summary>
 public class CharacterManager : MonoBehaviour
 {
     public List<BaseCharacter> characters = new List<BaseCharacter>(5);
-    
     public string changeButton = "x";
 
     private int selectedCharIndex = 0;
@@ -18,7 +19,7 @@ public class CharacterManager : MonoBehaviour
     private GameObject transitionEffect;
 
 
-    void Start()
+    public void Start()
     {
         if (charController == null)
         {
@@ -31,7 +32,7 @@ public class CharacterManager : MonoBehaviour
         }
     }
 
-    void Update()
+    public void Update()
     {
         if (characters.Count > 0)
         {
@@ -51,7 +52,7 @@ public class CharacterManager : MonoBehaviour
         }
     }
 
-    void UpdateCurrentCharacter(int index)
+    private void UpdateCurrentCharacter(int index)
     {
         int indexRollback = selectedCharIndex;
 
@@ -94,7 +95,7 @@ public class CharacterManager : MonoBehaviour
         }
     }
 
-    IEnumerator PlayTransitionEffect(float delayTime, float effectTime)
+    private IEnumerator PlayTransitionEffect(float delayTime, float effectTime)
     {
         yield return new WaitForSeconds(delayTime);
         transitionEffect.SetActive(true);

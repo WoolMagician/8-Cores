@@ -26,7 +26,7 @@ public class CameraController : MonoBehaviour
     Vector3 camMask;
     Vector3 followMask;
 
-    Inventory inv;
+    InventoryOld inv;
     Vector3 StartPos; //Camera position at start
     Vector3 targetOffset;
     // Use this for initialization

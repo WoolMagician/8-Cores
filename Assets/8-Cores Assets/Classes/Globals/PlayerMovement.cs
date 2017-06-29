@@ -29,15 +29,31 @@ public class PlayerMovement : MonoBehaviour {
         var x = Input.GetAxis("Horizontal") * Time.deltaTime * forwardSpeed;
         var z = Input.GetAxis("Vertical") * Time.deltaTime * forwardSpeed;
 
-        if (camera.transform.rotation.eulerAngles.y > 0 && (x != 0 || z !=0))  // So che è un po' accroccato ma è decente. È il codice che ruota il pg se la camera ruota.
+        if (camera.transform.rotation.eulerAngles.y > 0 && (x != 0 || z !=0))  // So che ï¿½ un po' accroccato ma ï¿½ decente. ï¿½ il codice che ruota il pg se la camera ruota.
         {                                                                      
             if((camera.transform.rotation.eulerAngles.y != transform.rotation.eulerAngles.y))
             {
-                transform.Rotate(Vector3.up, (camera.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y)); // Dividendo la sottrazione per un numero (basso se si vuole un movimento rapido, alto se più fulmineo) il pg fa una piacevole rotazione. Il problema è che la camera si perde dopo un po' per ovvi motivi.
+                transform.Rotate(Vector3.up, (camera.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y)); // Dividendo la sottrazione per un numero (basso se si vuole un movimento rapido, alto se piï¿½ fulmineo) il pg fa una piacevole rotazione. Il problema ï¿½ che la camera si perde dopo un po' per ovvi motivi.
             }                                                                                                              
         }
 
         transform.Translate(x, 0, z);
+    }
+
+    public IEnumerator LockMovement(float delayTime, float lockTime) //Guardare GameManager funzione LoadScene.
+    {
+        yield return new WaitForSeconds(delayTime);
+        //canAction = false;
+        //canMove = false;
+        //animator.SetBool("Moving", false);
+        //rb.velocity = Vector3.zero;
+        //rb.angularVelocity = Vector3.zero;
+        //inputVec = new Vector3(0, 0, 0);
+        //animator.applyRootMotion = true;
+        yield return new WaitForSeconds(lockTime);
+    //    canAction = true;
+    //    canMove = true;
+    //    animator.applyRootMotion = false;
     }
 
 }
@@ -48,4 +64,4 @@ public class PlayerMovement : MonoBehaviour {
 //                                                  -salto
 //                                                  -controllo analogico/camminata-corsa
 
-    //                  QUESTO È QUELLO BUONO, NON PLAYER CONTROL CHE È SCRITTO DA PODDAMMERDA
+    //                  QUESTO ï¿½ QUELLO BUONO, NON PLAYER CONTROL CHE ï¿½ SCRITTO DA PODDAMMERDA

@@ -399,9 +399,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 1427177022}
+        m_MethodName: LoadGame
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1139,10 +1139,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02a602e5c6d478649a207b44efedc491, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackValue: 0
-  weaponName: 
-  weaponID: 0
-  batterySlots: 0
 --- !u!23 &187113294
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1610,14 +1606,14 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 212103118}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -175.33414, y: 13.629963, z: -227.16653}
-  m_LocalScale: {x: 3.0697675, y: 3.0697675, z: 3.0697675}
+  m_LocalPosition: {x: -8.855263, y: 0.688385, z: -11.473059}
+  m_LocalScale: {x: 0.15503877, y: 0.15503877, z: 0.15503877}
   m_Children:
   - {fileID: 1755872926}
   - {fileID: 1225042508}
   - {fileID: 588021535}
-  m_Father: {fileID: 569965966}
-  m_RootOrder: 6
+  m_Father: {fileID: 1935208080}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &215479039
 GameObject:
@@ -1798,7 +1794,7 @@ Transform:
   - {fileID: 1531393232}
   - {fileID: 636773861}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &242744712
 GameObject:
@@ -3149,6 +3145,7 @@ GameObject:
   - component: {fileID: 569965964}
   - component: {fileID: 569965963}
   - component: {fileID: 569965967}
+  - component: {fileID: 569965968}
   m_Layer: 5
   m_Name: GUI
   m_TagString: Untagged
@@ -3233,7 +3230,6 @@ RectTransform:
   - {fileID: 1215735216}
   - {fileID: 1097142645}
   - {fileID: 603955712}
-  - {fileID: 212103120}
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3253,6 +3249,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 010a4fc465c6fc049a87ddbe4ecdfcb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &569965968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 569965962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b33a2b6e748a474ea0e1c52c533a8e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  newGameButton: {fileID: 84333832}
+  continueGameButton: {fileID: 1209618763}
+  optionsButton: {fileID: 1215735217}
+  optionsMenu: {fileID: 0}
+  savesScrollableList: {fileID: 603955715}
+  savesSlotList:
+  - {fileID: 712102219}
+  - {fileID: 1690627329}
+  - {fileID: 375215679}
+  - {fileID: 1282281704}
+  - {fileID: 907021710}
+  - {fileID: 304305749}
+  - {fileID: 212007577}
+  - {fileID: 1731688296}
+  - {fileID: 506078728}
+  - {fileID: 1097893425}
 --- !u!1 &571414610
 GameObject:
   m_ObjectHideFlags: 0
@@ -3361,7 +3384,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Now Loading...
+  m_Text: Now Loading... 0%
 --- !u!222 &588021534
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7220,10 +7243,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02a602e5c6d478649a207b44efedc491, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackValue: 0
-  weaponName: 
-  weaponID: 0
-  batterySlots: 0
 --- !u!23 &875287491
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -11096,7 +11115,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1097142644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14786,7 +14805,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1153938365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17975,8 +17994,8 @@ GameObject:
   - component: {fileID: 1189814112}
   - component: {fileID: 1189814111}
   - component: {fileID: 1189814110}
-  - component: {fileID: 1189814109}
   - component: {fileID: 1189814122}
+  - component: {fileID: 1189814109}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -17990,16 +18009,16 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1189814108}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 293c5bfc692c0934da6d71296727707b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DistanceAway: 0
-  DistanceUp: 0
+  DistanceAway: 2
+  DistanceUp: 2
   smooth: 4
   rotateAround: 70
-  target: {fileID: 1794188034}
+  target: {fileID: 1254815804}
   CamOcclusion:
     serializedVersion: 2
     m_Bits: 0
@@ -18199,7 +18218,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 1.4430001, z: 0}
 --- !u!114 &1189814122
 MonoBehaviour:
@@ -18969,13 +18988,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c368b59aae3b674185b370feea3e854, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterName: Testone
-  health: 10
-  walkSpeed: 1
-  runSpeed: 1
-  jumpSpeed: 1
-  jumpForce: 1
-  isSelected: 0
 --- !u!114 &1254815799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19648,134 +19660,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f75abd495c02c8749beefa8b58e133b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allSessions:
-  - ID: 0
-    lastActivityDate: 6/24/2017 3:53:18 PM
-    inventory:
-      currentJunks: 0
-      openInventoryButton: PS4_TRIANGLE
-      openInventoryKey: 
-      isInvOpened: 0
-      isQuickOpened: 1
-      maxSlotNumber: 0
-      quickAccessSlotNumber: 0
-      items: []
-    character:
-      characterName: 
-      health: 0
-      walkSpeed: 0
-      runSpeed: 0
-      jumpSpeed: 0
-      jumpForce: 0
-      isSelected: 0
-    miniature: 00
-  - ID: 0
-    lastActivityDate: 6/24/2017 3:53:18 PM
-    inventory:
-      currentJunks: 0
-      openInventoryButton: PS4_TRIANGLE
-      openInventoryKey: 
-      isInvOpened: 0
-      isQuickOpened: 1
-      maxSlotNumber: 0
-      quickAccessSlotNumber: 0
-      items: []
-    character:
-      characterName: 
-      health: 0
-      walkSpeed: 0
-      runSpeed: 0
-      jumpSpeed: 0
-      jumpForce: 0
-      isSelected: 0
-    miniature: 00
-  - ID: 0
-    lastActivityDate: 6/24/2017 3:53:18 PM
-    inventory:
-      currentJunks: 0
-      openInventoryButton: PS4_TRIANGLE
-      openInventoryKey: 
-      isInvOpened: 0
-      isQuickOpened: 1
-      maxSlotNumber: 0
-      quickAccessSlotNumber: 0
-      items: []
-    character:
-      characterName: 
-      health: 0
-      walkSpeed: 0
-      runSpeed: 0
-      jumpSpeed: 0
-      jumpForce: 0
-      isSelected: 0
-    miniature: 00
-  - ID: 0
-    lastActivityDate: 6/24/2017 3:53:18 PM
-    inventory:
-      currentJunks: 0
-      openInventoryButton: PS4_TRIANGLE
-      openInventoryKey: 
-      isInvOpened: 0
-      isQuickOpened: 1
-      maxSlotNumber: 0
-      quickAccessSlotNumber: 0
-      items: []
-    character:
-      characterName: 
-      health: 0
-      walkSpeed: 0
-      runSpeed: 0
-      jumpSpeed: 0
-      jumpForce: 0
-      isSelected: 0
-    miniature: 00
-  - ID: 0
-    lastActivityDate: 6/24/2017 3:53:18 PM
-    inventory:
-      currentJunks: 0
-      openInventoryButton: PS4_TRIANGLE
-      openInventoryKey: 
-      isInvOpened: 0
-      isQuickOpened: 1
-      maxSlotNumber: 0
-      quickAccessSlotNumber: 0
-      items: []
-    character:
-      characterName: 
-      health: 0
-      walkSpeed: 0
-      runSpeed: 0
-      jumpSpeed: 0
-      jumpForce: 0
-      isSelected: 0
-    miniature: 00
   newGame: 0
   isLoading: 0
   isSaving: 0
-  mainGUI: {fileID: 1097142644}
+  mainGUI: {fileID: 569965968}
   loadingScreen: {fileID: 212103119}
-  currentSession:
-    ID: 0
-    lastActivityDate: 6/24/2017 3:53:18 PM
-    inventory:
-      currentJunks: 0
-      openInventoryButton: 
-      openInventoryKey: 
-      isInvOpened: 0
-      isQuickOpened: 0
-      maxSlotNumber: 0
-      quickAccessSlotNumber: 0
-      items: []
-    character:
-      characterName: 
-      health: 0
-      walkSpeed: 0
-      runSpeed: 0
-      jumpSpeed: 0
-      jumpForce: 0
-      isSelected: 0
-    miniature: 00
-  test: {fileID: 8400000, guid: e24733c66c3d5ea4da23e75aea023687, type: 2}
+  allSessions: []
 --- !u!4 &1427177023
 Transform:
   m_ObjectHideFlags: 0
@@ -19830,10 +19720,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02a602e5c6d478649a207b44efedc491, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackValue: 0
-  weaponName: 
-  weaponID: 0
-  batterySlots: 0
 --- !u!23 &1494541127
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -23137,10 +23023,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02a602e5c6d478649a207b44efedc491, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackValue: 0
-  weaponName: 
-  weaponID: 0
-  batterySlots: 0
 --- !u!114 &1556660970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24603,7 +24485,7 @@ Transform:
   - {fileID: 1556660976}
   - {fileID: 1153938366}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1794188035
 MonoBehaviour:
@@ -28018,6 +27900,112 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1925373808}
+--- !u!1 &1935208076
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1935208080}
+  - component: {fileID: 1935208079}
+  - component: {fileID: 1935208078}
+  - component: {fileID: 1935208077}
+  - component: {fileID: 1935208081}
+  m_Layer: 0
+  m_Name: LoadingScreenCanvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1935208077
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1935208076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &1935208078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1935208076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 1
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 100000
+  m_ReferenceResolution: {x: 1, y: 1}
+  m_ScreenMatchMode: 1
+  m_MatchWidthOrHeight: 0.5
+  m_PhysicalUnit: 0
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+--- !u!223 &1935208079
+Canvas:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1935208076}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 0
+  m_Camera: {fileID: 1189814120}
+  m_PlaneDistance: 0
+  m_PixelPerfect: 1
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 1
+  m_TargetDisplay: 0
+--- !u!224 &1935208080
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1935208076}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 212103120}
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &1935208081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1935208076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 010a4fc465c6fc049a87ddbe4ecdfcb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1986503754
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,8 +1,8 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Rotate : MonoBehaviour {
+public class RotateObject : MonoBehaviour {
 
     public int dir = 1;
     public float vel = 1.0f;

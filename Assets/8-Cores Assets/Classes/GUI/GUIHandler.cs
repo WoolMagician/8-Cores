@@ -3,7 +3,7 @@ using UnityEngine;
 public class GUIHandler : MonoBehaviour
 {
     [HideInInspector]
-    public Inventory inventory;
+    public InventoryOld inventory;
     
     void OnGUI()
     {

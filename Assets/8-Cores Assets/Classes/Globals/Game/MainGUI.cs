@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
+/// <summary>
+/// 
+/// </summary>
 public class MainGUI : MonoBehaviour
 {
     //MAIN MENU VARIABLES.
@@ -14,6 +16,10 @@ public class MainGUI : MonoBehaviour
     public ScrollRect savesScrollableList;
     public SaveSlotGUI[] savesSlotList;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="gameManager"></param>
     public void PopulateSaveList(GameManager gameManager)
     {
         int count;
@@ -30,20 +36,15 @@ public class MainGUI : MonoBehaviour
         {
             //ADD OTHER INFOS;
             SaveSlotGUI tempSaveSlotGUI;
-
             Texture2D tempMiniature = new Texture2D(100,100);
 
+            tempMiniature.LoadImage(gameManager.allSessions[i].miniatureBytes);
+
             tempSaveSlotGUI = savesSlotList[i];
-
-            tempMiniature.LoadImage(gameManager.allSessions[i].miniature);
-
             tempSaveSlotGUI.miniature.texture = tempMiniature;
-
             tempSaveSlotGUI.miniature.color = Color.white;
-
-            tempSaveSlotGUI.characterName.text = "Character: " + gameManager.allSessions[i].character.characterName;
-
-            tempSaveSlotGUI.dateTime.text = "Save date: " + gameManager.allSessions[i].lastActivityDate;
+            tempSaveSlotGUI.characterName.text = "Character: " + gameManager.allSessions[i].character.Name;
+            tempSaveSlotGUI.dateTime.text = "Save date: " + gameManager.allSessions[i].lastSaveDate;
 
         }
     }

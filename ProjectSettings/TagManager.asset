@@ -12,6 +12,7 @@ TagManager:
   - Environment
   - Inventory
   - SaveSlot
+  - PlayerSpawnPoint
   layers:
   - Default
   - TransparentFX

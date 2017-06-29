@@ -1,28 +1,18 @@
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEditor;
 using System;
 using System.Collections;
 using System.IO;
-using System.Linq;
-using System.Reflection;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityStandardAssets.ImageEffects;
 
-
+/// <summary>
+/// 
+/// </summary>
 public class GameManager : MonoBehaviour
 {
-    //DA FINIRE LOADING SESSION
-    public GameSession[] allSessions = new GameSession[5];    //Tutti i salvataggi fatti fin'ora
-    private GameSession tempSession;    //Sessione temporanea di appoggio per il salvataggio/caricamento dati.
-    private GameSettings gameSettings = new GameSettings();
-    private BaseCharacter tempChar;
-
-    private int screenWidth = Screen.width;
-    private int screenHeight = Screen.height;
-    private int sessionToLoadIndex;
-
     [HideInInspector]
     public bool newGame = false;
 
@@ -32,38 +22,34 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public bool isSaving = false;
 
-    //Da commentare
-    public static DataManager dataManager;
     public MainGUI mainGUI;
     public LoadingScreen loadingScreen;
     public GameSession currentSession;
+    public GameSession[] allSessions = new GameSession[0];    //Tutti i salvataggi fatti fin'ora
 
-    //DATAMANGER VARS
-    //All savable classes
-    private SavedCharacter tempCharacter;
-    private SavedInventory tempInventory;
-    private SavedEnvironment tempEnvironment;
-    private SavedSettings tempSettings;
-
-    private BinaryFormatter binFormatter = new BinaryFormatter();
-    private FileStream file = null;
-    private static string settingsPath;
-    private static string savesPath;
-    private static string dateTimeFormatString = "ddMMyyyyHHmmss";
-    private static List<GameSession> savedSessions = new List<GameSession>();
-    public RenderTexture test;
-
-    private Camera mainCamera;
-
-
+    private GameSession _tempSession;    //Sessione temporanea di appoggio per il salvataggio/caricamento dati.
+    private GameSettings _gameSettings = new GameSettings();
+    private BaseCharacter _tempChar;
+    private SavedSettings _tempSettings;
+    private BinaryFormatter _binFormatter = new BinaryFormatter();
+    private FileStream _file = null;
+    private Camera _mainCamera;
+    private static List<GameSession> _savedSessions = new List<GameSession>();
+    private int _screenWidth = Screen.width;
+    private int _screenHeight = Screen.height;
+    private int _sessionToLoadIndex;
+    private static string _settingsPath;
+    private static string _savesPath;
+    private static string _dateTimeFormatString = "ddMMyyyyHHmmss";
+ 
     /// <summary>
     /// 
     /// </summary>
-    void Start()
+    public void Start()
     {
-        mainCamera = Camera.main;
-        settingsPath = Application.persistentDataPath + "/settings.ecd";
-        savesPath = Application.persistentDataPath + "/Saves";
+        this._mainCamera = Camera.main;
+        _settingsPath = Application.persistentDataPath + "/settings.ecd";
+        _savesPath = Application.persistentDataPath + "/Saves";
 
         //Creates Saves directory and base settings file.
         if (!Directory.Exists(Application.persistentDataPath + "/Saves"))
@@ -76,13 +62,12 @@ public class GameManager : MonoBehaviour
             File.Create(Application.persistentDataPath + "/settings.ecd");
         }
 
-        //Load all sessions, user will chose wich one to load.
-        allSessions = LoadAllSessions().ToArray();
+        LoadAndUpdateSessions();
 
         //Load settings.
-        gameSettings = LoadSettings();
+        this._gameSettings = LoadSettings();
 
-        sessionToLoadIndex = -1;
+        this._sessionToLoadIndex = -1;
 
         //Check if there are any save files and let user chose.
         if (allSessions.Length < 1)
@@ -102,7 +87,10 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void Update()
+    /// <summary>
+    /// 
+    /// </summary>
+    public void Update()
     {
         if (Input.GetKeyDown(KeyCode.F3))
         {
@@ -112,13 +100,13 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F11))
         {
-            SaveSettings(gameSettings);
+            SaveSettings(this._gameSettings);
 
         }
 
         else if (Input.GetKeyDown(KeyCode.F12))
         {
-            gameSettings = LoadSettings();
+            this._gameSettings = LoadSettings();
 
         }
 
@@ -135,35 +123,20 @@ public class GameManager : MonoBehaviour
 
             //currentSession.character = new SavedCharacter();
 
-            tempSession = currentSession;
-            SaveSession(tempSession);
+            this._tempSession = currentSession;
+            SaveSession(this._tempSession);
 
-            Debug.Log("New game created!");
-        }
-        else
-        {
-            //WE SHOULD NEVER GET HERE!
-            Debug.LogError("GameManager.cs: NewGame() function error!");
-        }
-    }
+            UnityEngine.Debug.Log("New game created!");
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public void LoadGame()
-    {
-        if(sessionToLoadIndex > -1)
-        {
-            currentSession = LoadSession(sessionToLoadIndex);
-            currentSession.Update(this);
+            
+
 
         }
         else
         {
             //WE SHOULD NEVER GET HERE!
-            Debug.LogError("GameManager.cs: LoadGame() function error!");
+            UnityEngine.Debug.LogError("GameManager.cs: NewGame() function error!");
         }
-
     }
 
     /// <summary>
@@ -187,6 +160,17 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 
     /// </summary>
+    public void LoadGame()
+    {
+
+
+        StartCoroutine(LoadSceneWithPlayerProgress(currentSession, loadingScreen, false));
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <returns></returns>
     public IEnumerator Save()   //WE SHOULD CHECK SAVING FUNCTION ACKNOWLEDGE MADONNADDIO
     {
@@ -195,16 +179,16 @@ public class GameManager : MonoBehaviour
         isSaving = true;
 
         //Using lambda expression to return values from SaveMiniature iterator.
-        yield return SaveMiniature(value => currentSession.miniature = value);
+        yield return SaveMiniature(value => currentSession.miniatureBytes = value);
 
         //Using a temporary session for saving.
-        tempSession = currentSession;
+        this._tempSession = currentSession;
 
         //Save session with index increased.
-        SaveSession(tempSession);
+        SaveSession(this._tempSession);
 
-        //Update sessions list.
-        allSessions = LoadAllSessions().ToArray();
+        //Re-load all sessions.
+        LoadAndUpdateSessions();
 
         isSaving = false;
 
@@ -225,25 +209,25 @@ public class GameManager : MonoBehaviour
         //Waiting for end of current frame.
         yield return new WaitForEndOfFrame();
 
-        blur = mainCamera.GetComponent<BlurOptimized>();
+        blur = this._mainCamera.GetComponent<BlurOptimized>();
 
         renderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
         renderTexture.useMipMap = false;
         renderTexture.antiAliasing = 1;
 
         RenderTexture.active = renderTexture;
-        mainCamera.targetTexture = renderTexture;
+        this._mainCamera.targetTexture = renderTexture;
 
         miniature = new Texture2D(Screen.width, Screen.height, TextureFormat.ARGB32, false);
         blur.enabled = false; //Disable blur temporarly just for shot.
 
-        mainCamera.Render();
+        this._mainCamera.Render();
         miniature.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, false);
 
-        blur.enabled = true;
+        //blur.enabled = true;
         miniature.Apply();
 
-        mainCamera.targetTexture = null;
+        this._mainCamera.targetTexture = null;
         RenderTexture.active = null;
         Destroy(renderTexture);
 
@@ -256,27 +240,27 @@ public class GameManager : MonoBehaviour
     /// 
     /// </summary>
     /// <param name="session"></param>
-    public void SaveSession(GameSession session)
+    private void SaveSession(GameSession session)
     {
         try
         {
-            session.PrepareSessionForSaving(this);
+            this.PrepareSessionForSaving(session);
 
-            savedSessions.Clear();
-            savedSessions.Add(session);
+            _savedSessions.Clear();
+            _savedSessions.Add(session);
 
-            file = File.Create(savesPath + "/SAV_" + DateTime.Now.ToString(dateTimeFormatString) + ".ecd");
+            this._file = File.Create(_savesPath + "/SAV_" + DateTime.Now.ToString(_dateTimeFormatString) + ".ecd");
 
-            binFormatter.Serialize(file, savedSessions);
+            this._binFormatter.Serialize(this._file, _savedSessions);
 
-            file.Close();
+            this._file.Close();
 
-            Debug.Log("Saved new session -ID: " + savedSessions[0].ID + "- to path: " + savesPath + "/SAV_" + DateTime.Now.ToString(dateTimeFormatString) + ".ecd");
+            UnityEngine.Debug.Log("Saved new session -ID: " + _savedSessions[0].ID + "- to path: " + _savesPath + "/SAV_" + DateTime.Now.ToString(_dateTimeFormatString) + ".ecd");
 
         }
         catch (System.Exception)
         {
-            Debug.LogWarning("Failed to save session.");
+            UnityEngine.Debug.LogWarning("Failed to save session.");
             throw;
         }
     }
@@ -285,18 +269,18 @@ public class GameManager : MonoBehaviour
     /// 
     /// </summary>
     /// <returns></returns>
-    public GameSession LoadSession(int index)
+    private GameSession LoadSession(int index)
     {
-        DirectoryInfo dir = new DirectoryInfo(savesPath);
+        DirectoryInfo dir = new DirectoryInfo(_savesPath);
         FileInfo[] fi = dir.GetFiles();
         List<GameSession> tempSessionList;
         GameSession returnGameSession = null;
 
         int count = fi.Length;
 
-        if (Directory.Exists(savesPath))
+        if (Directory.Exists(_savesPath))
         {
-            Debug.Log("Loading save file...");
+            UnityEngine.Debug.Log("Loading save file...");
 
             for (int i = 0; i < count; i++)
             {
@@ -304,13 +288,13 @@ public class GameManager : MonoBehaviour
 
                 if (File.Exists(fileName))
                 {
-                    file = File.Open(fileName, FileMode.Open);
+                    this._file = File.Open(fileName, FileMode.Open);
 
-                    tempSessionList = ((List<GameSession>)binFormatter.Deserialize(file));
+                    tempSessionList = ((List<GameSession>)this._binFormatter.Deserialize(this._file));
 
                     if (tempSessionList[0].ID == index)
                     {
-                        Debug.Log("Loaded: " + fileName);
+                        UnityEngine.Debug.Log("Loaded: " + fileName);
                         returnGameSession = tempSessionList[0];
 
                         continue;
@@ -320,16 +304,16 @@ public class GameManager : MonoBehaviour
                 else
                 {
                     //WE SHOULD NEVER GET THERE PORCODIO!!!
-                    Debug.LogWarning("Error while loading file: File '" + fileName + "' not found.");
+                    UnityEngine.Debug.LogWarning("Error while loading file: File '" + fileName + "' not found.");
                     break;
                 }
 
             }
-            file.Close();
+            this._file.Close();
         }
         else
         {
-            Debug.LogWarning("Error while searching files: Directory '" + savesPath + "' not found.");
+            UnityEngine.Debug.LogWarning("Error while searching files: Directory '" + _savesPath + "' not found.");
         }
 
         return returnGameSession;
@@ -339,20 +323,20 @@ public class GameManager : MonoBehaviour
     /// 
     /// </summary>
     /// <returns></returns>
-    public List<GameSession> LoadAllSessions()
+    private List<GameSession> LoadAllSessions()
     {
-        DirectoryInfo dir = new DirectoryInfo(savesPath);
+        DirectoryInfo dir = new DirectoryInfo(_savesPath);
         FileInfo[] fi = dir.GetFiles();
 
         List<GameSession> tempSessionList;
 
         int count = fi.Length;
 
-        savedSessions.Clear();
+        _savedSessions.Clear();
 
-        if (Directory.Exists(savesPath))
+        if (Directory.Exists(_savesPath))
         {
-            Debug.Log("Updating save files list...");
+            UnityEngine.Debug.Log("Updating save files list...");
 
             for (int i = 0; i < count; i++)
             {
@@ -360,50 +344,81 @@ public class GameManager : MonoBehaviour
 
                 if (File.Exists(fileName))
                 {
-                    file = File.Open(fileName, FileMode.Open);
+                    this._file = File.Open(fileName, FileMode.Open);
 
-                    tempSessionList = ((List<GameSession>)binFormatter.Deserialize(file));
-                    savedSessions.Add(tempSessionList[0]);
+                    tempSessionList = ((List<GameSession>)this._binFormatter.Deserialize(this._file));
+                    _savedSessions.Add(tempSessionList[0]);
                     tempSessionList.Clear();
 
-                    file.Close();
-                    Debug.Log("Found: " + fileName);
+                    this._file.Close();
+                    UnityEngine.Debug.Log("Found: " + fileName);
                 }
                 else
                 {
                     //WE SHOULD NEVER GET THERE PORCODIO!!!
-                    Debug.LogWarning("Error while loading file: File '" + fileName + "' not found.");
+                    UnityEngine.Debug.LogWarning("Error while loading file: File '" + fileName + "' not found.");
                 }
 
             }
 
-            Debug.Log("Done updating list!");
+            UnityEngine.Debug.Log("Done updating list!");
         }
         else
         {
-            Debug.LogWarning("Error while searching files: Directory '" + savesPath + "' not found.");
+            UnityEngine.Debug.LogWarning("Error while searching files: Directory '" + _savesPath + "' not found.");
         }
 
-        return savedSessions;
+        return _savedSessions;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="gameSession"></param>
+    private void UpdateSession(GameSession gameSession)
+    {
+        this._tempChar = GameObject.FindGameObjectWithTag("Player").GetComponent<BaseCharacter>();
+
+        //Update player stats.
+        ClassMerger.MergeClassProperties(gameSession.character, this._tempChar);
+
+        //Update player position.
+        this._tempChar.transform.position = gameSession.character.GetPosition();
+        this._tempChar.transform.rotation = Quaternion.Euler(gameSession.character.GetRotation());
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="gameSession"></param>
+    private void PrepareSessionForSaving(GameSession gameSession)
+    {
+        this._tempChar = GameObject.FindGameObjectWithTag("Player").GetComponent<BaseCharacter>();
+        ClassMerger.MergeClassProperties(this._tempChar, gameSession.character);
+
+        gameSession.lastSaveDate = DateTime.Now.ToString();
+        gameSession.ID = this.GetSavesNumber();
+
     }
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="settings"></param>
-    public void SaveSettings(GameSettings settings)
+    private void SaveSettings(GameSettings settings)
     {
-        tempSettings = new SavedSettings();
+        this._tempSettings = new SavedSettings();
 
-        MergeClassProperties(settings, tempSettings);
+        ClassMerger.MergeClassProperties(settings, this._tempSettings);
 
-        file = File.Create(settingsPath);
+        this._file = File.Create(_settingsPath);
 
-        binFormatter.Serialize(file, tempSettings);
+        this._binFormatter.Serialize(this._file, this._tempSettings);
 
-        file.Close();
+        this._file.Close();
 
-        Debug.Log("Data settings to path: " + settingsPath);
+        UnityEngine.Debug.Log("Data settings to path: " + _settingsPath);
 
     }
 
@@ -411,48 +426,163 @@ public class GameManager : MonoBehaviour
     /// 
     /// </summary>
     /// <returns></returns>
-    public GameSettings LoadSettings()
+    private GameSettings LoadSettings()
     {
         GameSettings retSettings = new GameSettings();
 
-        tempSettings = null;
+        this._tempSettings = null;
 
-        if (File.Exists(settingsPath))
+        if (File.Exists(_settingsPath))
         {
-            file = File.Open(settingsPath, FileMode.Open);
-            tempSettings = (SavedSettings)binFormatter.Deserialize(file);
-            file.Close();
+            this._file = File.Open(_settingsPath, FileMode.Open);
+            this._tempSettings = (SavedSettings)this._binFormatter.Deserialize(this._file);
+            this._file.Close();
 
         }
         else
         {
-            tempSettings = new SavedSettings();
-            Debug.LogWarning("No settings found, default ones loaded");
+            this._tempSettings = new SavedSettings();
+            UnityEngine.Debug.LogWarning("No settings found, default ones loaded");
         }
 
-        MergeClassProperties(tempSettings, retSettings);
+        ClassMerger.MergeClassProperties(this._tempSettings, retSettings);
 
         return retSettings;
     }
 
     /// <summary>
-    /// Function used to merge different class types with same properties.
+    /// Load scene in background with loading screen.
     /// </summary>
-    /// <param name="from"></param>
-    /// <param name="to"></param>
-    public void MergeClassProperties(System.Object from, System.Object to)
+    /// <example>
+    /// This could be the possible usage of <see cref="LoadScene(int, LoadingScreen, bool)"/> method.
+    /// <code>
+    /// StartCoroutine(GameSceneManager.LoadSceneAysnc(0, loadingScreen, false));
+    /// </code>
+    /// </example>
+    /// <param name="sceneIndex">Index of scene to load</param>
+    /// <param name="loadingScreen">Loading screen instance</param>
+    /// <param name="showProgress">If true, shows the loading text and logo. This should be set to false when loading fast scenes such as house rooms.</param>
+    /// <returns></returns>
+    private IEnumerator LoadScene(int sceneIndex, LoadingScreen loadingScreen, bool showProgress)
     {
-        ClassMerger.MergeClassProperties(from, to);
+        AsyncOperation asyncOp = null;
+
+        //Wait for fade in effect before loading the scene.
+        yield return new WaitForSeconds(0.5f);
+
+        //Start loading scene.
+        asyncOp = SceneManager.LoadSceneAsync(sceneIndex);
+
+        //Update progress.
+        if (showProgress) //If we are not showing progress we don't need to update it.
+        {
+            StartCoroutine(UpdateLoadingProgress(loadingScreen, asyncOp));
+        }
+
+        //Busy wait.
+        while (!asyncOp.isDone)
+        {
+            yield return new WaitForSeconds(0.1f); 
+        }
+
+        yield return new WaitForSeconds(0.5f); //Just to make sure we loaded everything
+
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sceneIndex"></param>
+    /// <param name="gameSession"></param>
+    /// <param name="loadingScreen"></param>
+    /// <param name="showProgress"></param>
+    /// <returns></returns>
+    private IEnumerator LoadSceneWithPlayerProgress(GameSession gameSession, LoadingScreen loadingScreen, bool showProgress)
+    {
+        //We have to lock player movement/all types of input while loading.
+        //player.LockInputs() or maybe player.LockMovement()
+
+        //Disable GUI so that the player understands that inputs are temporarly disabled.
+        mainGUI.gameObject.SetActive(false);
+
+        Camera.main.GetComponent<CameraController>().enabled = false;
+
+        loadingScreen.showProgress = showProgress;
+        loadingScreen.enabled = true;
+
+        if (gameSession.SceneIndex > -1)
+        {
+            currentSession = LoadSession(gameSession.SceneIndex);
+            this.UpdateSession(currentSession);
+
+        }
+        else
+        {
+            //WE SHOULD NEVER GET HERE!
+            UnityEngine.Debug.LogError("GameManager.cs: LoadGame() function error!");
+        }
+
+
+        //Wait for scene to be loaded.
+        yield return LoadScene(gameSession.SceneIndex, loadingScreen, showProgress);
+
+        //
+        //Now we can update everything
+        Transform tempTransform;
+
+        tempTransform = GetPlayerSpawnPosInCurrentScene();
+
+        gameSession.character.SetPosition(tempTransform.position);
+        gameSession.character.SetRotation(tempTransform.rotation.eulerAngles);
+
+        UpdateSession(gameSession);
+
+        Camera.main.GetComponent<CameraController>().enabled = true;
+        //
+        yield return new WaitForSeconds(0.5f);
+
+        //When we finished updating, restore GUI and player movement.
+        loadingScreen.enabled = false;
+
+        //Enable GUI so that the player understands that inputs are re-enabled.
+        mainGUI.gameObject.SetActive(true);
+
+        //Now we can restore player inputs.
+        //player.UnlockInputs() or maybe player.UnlockMovement()
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="loadingScreen"></param>
+    /// <param name="asyncOp"></param>
+    /// <returns></returns>
+    private IEnumerator UpdateLoadingProgress(LoadingScreen loadingScreen, AsyncOperation asyncOp)
+    {
+        while (loadingScreen.enabled)
+        {
+            if (asyncOp != null && loadingScreen != null)
+            {
+                loadingScreen.text.text = string.Format("Now Loading... {0}%", asyncOp.progress * 100);
+            }
+            else
+            {
+                UnityEngine.Debug.Log("GameManager.cs: Error while updating loading progress, variables 'loadingScreen' and 'asyncOp' can't be null.");
+            }
+
+            yield return new WaitForSecondsRealtime(0.05f);
+
+        }
+
+    }
 
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    public int GetSavesNumber()
+    private int GetSavesNumber()
     {
-        DirectoryInfo dir = new DirectoryInfo(savesPath);
+        DirectoryInfo dir = new DirectoryInfo(_savesPath);
         FileInfo[] fi = dir.GetFiles();
 
         return fi.Length;
@@ -462,55 +592,38 @@ public class GameManager : MonoBehaviour
     /// 
     /// </summary>
     /// <param name="index"></param>
-    public void UpdateSessionToLoadIndex(int index)
+    private void UpdateSessionToLoadIndex(int index)
     {
-        sessionToLoadIndex = index;
+        this._sessionToLoadIndex = index;
     }
 
-    public void PopulateSaveList()
+    /// <summary>
+    /// 
+    /// </summary>
+    private void PopulateSaveList()
     {
         mainGUI.PopulateSaveList(this);
+
     }
-}
 
-/// <summary>
-/// 
-/// </summary>
-public class ClassMerger
-{
     /// <summary>
-    /// Function used to merge different class types with same properties.
+    /// 
     /// </summary>
-    /// <param name="copyFrom"></param>
-    /// <param name="copyTo"></param>
-    public static void MergeClassProperties(object copyFrom, object copyTo)
+    private void LoadAndUpdateSessions()
     {
-        BindingFlags flags;
+        //Resize array lenght according to saves number.
+        Array.Resize(ref allSessions, GetSavesNumber());
 
-        Dictionary<string, FieldInfo> targetDic;
+        //Load all sessions, user will chose wich one to load.
+        allSessions = LoadAllSessions().ToArray();
+    }
 
-        //Check if copyFrom or copyTo are null.
-        if ((copyFrom == null) || (copyTo == null))
-        {
-            return;
-
-        }
-
-        //Assign binding flags for property search.
-        flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-
-        targetDic = copyTo.GetType().GetFields(flags).ToDictionary(f => f.Name);
-
-        //Cicle trough each property of copyFrom, check if copyTo contains property then copy.
-        foreach (FieldInfo field in copyFrom.GetType().GetFields(flags))
-        {
-
-            if (targetDic.ContainsKey(field.Name))
-                targetDic[field.Name].SetValue(copyTo, field.GetValue(copyFrom));
-
-            else
-                Debug.LogWarning(string.Format("The field �{0}� has no corresponding field in the type �{1}�. Skipping field.", field.Name, copyTo.GetType().FullName));
-
-        }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private Transform GetPlayerSpawnPosInCurrentScene()
+    {
+       return GameObject.FindGameObjectWithTag("PlayerSpawnPoint").transform;
     }
 }

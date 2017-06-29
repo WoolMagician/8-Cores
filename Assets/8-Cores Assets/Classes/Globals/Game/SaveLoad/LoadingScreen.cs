@@ -2,24 +2,35 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
+/// <summary>
+/// 
+/// </summary>
 public class LoadingScreen : MonoBehaviour
 {
-    
     public Image background;
     public RawImage logo;
     public Text text;
+    private bool _showProgress = false;
 
-    // Use this for initialization
+    /// <summary>
+    /// 
+    /// </summary>
     void Start()
     {
  
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     private void Update()
     {
     
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     private void OnEnable()
     {
         background.gameObject.SetActive(true);
@@ -28,6 +39,9 @@ public class LoadingScreen : MonoBehaviour
         StartCoroutine(WaitForFadeIn(0.8f));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     private void OnDisable()
     {
         background.CrossFadeAlpha(0.0f, 0.4f, false);
@@ -44,8 +58,8 @@ public class LoadingScreen : MonoBehaviour
     private IEnumerator WaitForFadeIn(float secondsToWait)
     {
         yield return new WaitForSeconds(secondsToWait);
-        logo.gameObject.SetActive(true);
-        text.gameObject.SetActive(true);
+        logo.gameObject.SetActive(showProgress);
+        text.gameObject.SetActive(showProgress);
     }
 
     /// <summary>
@@ -59,5 +73,15 @@ public class LoadingScreen : MonoBehaviour
         background.gameObject.SetActive(false);
     }
 
-
+    public bool showProgress
+    {
+        get
+        {
+            return _showProgress;
+        }
+        set
+        {
+            _showProgress = value;
+        }
+    }
 }

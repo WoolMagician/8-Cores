@@ -44,10 +44,10 @@ public class InventoryData
         {
             InventorySlot tempSlot = new InventorySlot();
 
-            tempSlot.quickAccess = false;
+            //tempSlot.quickAccess = false;
             tempSlot.item = new BaseCollectibleItemData();
             tempSlot.ID = i;
-            tempSlot.currentSlotValue = 0;
+            tempSlot.value = 0;
 
             slotList.Add(tempSlot.ID, tempSlot);
         }
@@ -89,24 +89,22 @@ public class InventoryData
 
         foreach (KeyValuePair<int, InventorySlot> slot in slotList)
         {
-            if (!slot.Value.quickAccess)
-            {
+            //if (!slot.Value.quickAccess)
+            //{
                 if (slot.Value.item.type == objectToAdd.type)
                 {
-                    if (!slot.Value.slotFull)
+                    if (!slot.Value.isFull)
                     {
                         needNewItemSlot = false;
 
-                        slot.Value.currentSlotValue += 1;
-
-                        slot.Value.CheckMaxValue();
+                        slot.Value.value += 1;
 
                         Debug.Log("PICKED UP OBJECT!");
 
                         return ActionResult.Success;
                     }
                 }
-            }
+            //}
 
         }
 
@@ -122,13 +120,13 @@ public class InventoryData
 
             foreach (KeyValuePair<int, InventorySlot> slot1 in slotList)
             {
-                if (!slot1.Value.quickAccess)
-                {
+                //if (!slot1.Value.quickAccess)
+                //{
                     if (slot1.Value.item.type == objectToAdd.type)
                     {
                         slotCounter += 1;
                     }
-                }
+                //}
             }
 
             if (slotCounter < objectToAdd.maxStackNumber)
@@ -137,7 +135,7 @@ public class InventoryData
                 {
                     InventorySlot tempSlot = new InventorySlot();
 
-                    tempSlot.currentSlotValue = 1;
+                    tempSlot.value = 1;
 
                     tempSlot.item = objectToAdd;
 
@@ -172,16 +170,16 @@ public class InventoryData
         {
             if (slot.Value.item.type == itemToRemove)
             {
-                if (slot.Value.currentSlotValue >= quantity)
+                if (slot.Value.value >= quantity)
                 {
 
                     //if (quantity < slot.currentSlotValue)
                     //{
-                    slot.Value.currentSlotValue -= quantity;
+                    slot.Value.value -= quantity;
 
-                    Debug.Log(slot.Value.currentSlotValue);
+                    Debug.Log(slot.Value.value);
 
-                    if (slot.Value.currentSlotValue == 0)
+                    if (slot.Value.value == 0)
                     {
                         slotList.Remove(slot);
                     }
